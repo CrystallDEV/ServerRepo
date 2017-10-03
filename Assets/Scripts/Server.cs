@@ -5,27 +5,35 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using UnityEngine;
+using Utility;
+using Random = System.Random;
 
-partial class Server : MonoBehaviour {
+internal partial class Server
+{
     private NetPeerConfiguration config;
     public NetServer server;
 
     public Dictionary<IPEndPoint, ClientData> clients;
     public Dictionary<short, Transform> clientsTransform;
-    public static List<NetworkObject> netObjs = new List<NetworkObject>();
+    public static Dictionary<int, NetworkObject> netObjs = new Dictionary<int, NetworkObject>();
+    private int objectCount;
 
     private Thread serverThread;
     //  private Thread gameThread;
 
-    private bool debugMode = false;
-    private bool isStarted = false;
+    public bool debugMode;
+    private bool isStarted;
 
     public Transform playerPrefab;
 
     public Transform redBase;
     public Transform blueBase;
 
-    public enum PacketTypes {
+    private PrefabManager _prefabManager;
+
+    public enum PacketTypes
+    {
+        //BASIC TYPES
         CONNECTED,
         DISCONNECTED,
         PLAYERLIST,
@@ -34,17 +42,28 @@ partial class Server : MonoBehaviour {
         DAMAGE,
         ANIMATION,
         TEXTMESSAGE,
-        NETOBJ,
         SPAWNPREFAB,
+        UPDATEPREFAB,
+        DESTROYPREFAB,
         TEAMSELECT,
+        RESPAWN,
+
+        //Worldevents
+        DROP,
+        PICKUP,
+
+        //INTERACTIONS
+        TREECUTTING
     }
 
-    private void Start () {
+    private void Start()
+    {
         Debug.Log("Setting up server ...");
 
         clients = new Dictionary<IPEndPoint, ClientData>();
         clientsTransform = new Dictionary<short, Transform>();
-        try {
+        try
+        {
             config = new NetPeerConfiguration("CrystallStudios");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -56,28 +75,34 @@ partial class Server : MonoBehaviour {
 
             server = new NetServer(config);
             server.Start();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Debug.Log("Error during startup: " + ex.Message);
             DeadLine();
         }
 
+        _prefabManager = GameObject.Find("PrefabManager").GetComponent<PrefabManager>();
+
         serverThread = new Thread(WorkMessages);
-        serverThread.Start(server);
+        serverThread.Start();
 
         //gameThread = new Thread(WorkGameData);
         //gameThread.Start();
         isStarted = true;
         Debug.Log("Server started successfully");
-
     }
 
-    private void Update () {
-        if (isStarted) {
-            CalculatePlayerMovement();
-        }
+    private void Update()
+    {
+        if (!isStarted) return;
+        
+        CalculatePlayerMovement();
+        CalculatePlayerDeathTime();
     }
 
-    public void DeadLine () {
+    public void DeadLine()
+    {
         serverThread.Abort();
         serverThread.Join();
         //gameThread.Abort();
@@ -86,8 +111,9 @@ partial class Server : MonoBehaviour {
         Debug.Log("Server shutdown complete!");
     }
 
-    public static short GetFreeID () {
-        List<short> usedIds = (from netOBJ in netObjs select netOBJ.GetID).ToList();
+    public static short GetFreeID()
+    {
+        List<int> usedIds = (from netOBJ in netObjs select netOBJ.Key).ToList();
         if (usedIds.Count == 0) return 0;
 
         for (short id = 0; id <= usedIds.Count; id++)
@@ -95,5 +121,24 @@ partial class Server : MonoBehaviour {
                 return id;
 
         return -1;
+    }
+
+    //HELPER / UTLITY
+    public static Vector3 CalculateDropLocation(Vector3 netObjLoc, int range)
+    {
+        Random ran = new Random();
+        float x = netObjLoc.x + ran.Next(-range, range);
+      
+        float z = netObjLoc.z + ran.Next(-range, range);
+        Debug.Log("X: " + x + "Z: " + z);
+        return new Vector3(x, netObjLoc.y, z);
+    }
+
+    //TODO check for interact range (Vector3 target, float range) -> problem with unity multithreading
+    private static bool CanInteract(ClientData client, Vector3 targetPos)
+    {
+        if (client.IsDead) return false;
+
+        return !(Vector3.Distance(client.Position, targetPos) > GameConstants.interactRange);
     }
 }

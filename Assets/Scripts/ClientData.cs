@@ -4,7 +4,8 @@ using System.Net;
 using Lidgren.Network;
 using UnityEngine;
 
-public enum MoveDirs {
+public enum MoveDirs
+{
     UP,
     UPRIGHT,
     RIGHT,
@@ -16,33 +17,45 @@ public enum MoveDirs {
     NONE
 }
 
-public enum AnimationStates {
+public enum AnimationStates
+{
     IDLE,
     WALK,
     ATTACK
 }
 
-public class ClientData {
 
-    public ClientData (NetConnection connection, short id) {
+public enum WeaponState
+{
+    none,
+    WEAPON,
+    UTILITY
+}
+
+public class ClientData
+{
+    public ClientData(NetConnection connection, short id)
+    {
         Connection = connection;
         ID = id;
         MaxHitpoints = 50;
         CurrentHitpoints = MaxHitpoints;
         Speed = 6.0f;
-        MoveDir = MoveDirs.NONE;
+        moveDir = MoveDirs.NONE;
     }
 
-    public ClientData (short id) {
+    public ClientData(short id)
+    {
         ID = id;
         MaxHitpoints = 50;
         CurrentHitpoints = MaxHitpoints;
         Speed = 6.0f;
-        MoveDir = MoveDirs.NONE;
+        moveDir = MoveDirs.NONE;
     }
 
     public short ID { get; private set; }
-    public NetConnection Connection { get; private set; }
+    public string UserName { get; set; }
+    public NetConnection Connection { get; protected set; }
 
     public Vector3 Position { get; set; }
     public Vector3 LastPosition { get; set; }
@@ -54,12 +67,17 @@ public class ClientData {
     public int Team { get; set; }
 
     public AnimationStates animationState { get; set; }
-    public MoveDirs MoveDir { get; set; }
+    public MoveDirs moveDir { get; set; }
+
+    public WeaponState WeaponState { get; set; }
 
     public float Speed { get; set; }
+    public float DeathTime { get; set; }
     public bool IsDead { get; set; }
+    public bool IsAiming { get; set; }
 
-    public static short GetFreeID (IDictionary<IPEndPoint, ClientData> clients) {
+    public static short GetFreeID(IDictionary<IPEndPoint, ClientData> clients)
+    {
         List<short> usedIds = (from client in clients select client.Value.ID).ToList();
         if (usedIds.Count == 0) return 0;
 
@@ -70,4 +88,13 @@ public class ClientData {
         return -1;
     }
 
+    public bool HasTeam()
+    {
+        return Team != 0;
+    }
+    
+    public void resetData()
+    {
+        
+    }
 }

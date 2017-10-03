@@ -1,4 +1,6 @@
-﻿public class Headquarter : Building {
+﻿using Buildings.Base;
+
+public class Headquarter : Building {
 
     public Headquarter () {
         BuildName = "Headquarter";

@@ -1,63 +1,69 @@
 ﻿using Lidgren.Network;
 using System.Linq;
 using UnityEngine;
+using Utility;
 
-public enum PrefabIDs {
-    STONE,
-    TREE,
-    ARROW   
-}
-public class NetworkObject : MonoBehaviour {
+public class NetworkObject : MonoBehaviour
+{
+    public PrefabTypes prefabType;
+    
+    public short ID { get; set; }
 
-    private short ID;
+    public Vector3 LastPosition { get; protected set; }
+    public Vector3 Position { get; protected set; }
+    public Vector3 Rotation { get; protected set; }
+    public bool isMoveable;
 
-    [SerializeField]
-    private PrefabIDs prefabID;
+    private Server server;
 
-    private Vector3 lastPosition;
-    private Vector3 position;
-
-    Server server;
-
-    private void Awake () {
+    private void Awake()
+    {
         server = GameObject.Find("Server").GetComponent<Server>();
     }
 
-    private void Start () {
+    private void Start()
+    {
         ID = Server.GetFreeID();
-        Server.netObjs.Add(this);
+        Debug.Log("PrefabID: " + ID);
+        Server.netObjs.Add(ID, this);
+        Position = transform.position;
+        Rotation = transform.rotation.eulerAngles;
     }
 
-    private void Update () {
-        lastPosition = position;
-        position = transform.position;
-        if (position != transform.position) {
-            foreach (ClientData recipent in server.clients.Values.ToList()) {
-                NetOutgoingMessage response = server.server.CreateMessage();
-                response.Write((byte) Server.PacketTypes.NETOBJ);
-                response.Write(GetID);
-                response.Write(transform.position.x);
-                response.Write(transform.position.y);
-                response.Write(transform.position.z);
+    private void Update()
+    {
+        if (isMoveable)
+            updatePosition();
+    }
 
-                response.Write(transform.rotation.x);
-                response.Write(transform.rotation.y);
-                response.Write(transform.rotation.z);
-                server.server.SendMessage(response, recipent.Connection, NetDeliveryMethod.UnreliableSequenced);
-            }
+    private void updatePosition()
+    {
+        if (transform.position == LastPosition) return;
+        LastPosition = transform.position;
+        Position = transform.position;
+        foreach (ClientData recipent in server.clients.Values.ToList())
+        {
+            NetOutgoingMessage response = server.server.CreateMessage();
+            response.Write((byte) Server.PacketTypes.UPDATEPREFAB);
+            response.Write(ID);
+            response.Write(transform.position.x);
+            response.Write(transform.position.y);
+            response.Write(transform.position.z);
+
+            response.Write(transform.rotation.x);
+            response.Write(transform.rotation.y);
+            response.Write(transform.rotation.z);
+            server.server.SendMessage(response, recipent.Connection, NetDeliveryMethod.UnreliableSequenced);
         }
     }
 
-    private void OnDestroy () {
-        Server.netObjs.Remove(this);
+    private void OnDestroy()
+    {
+        Server.netObjs.Remove(ID);
     }
 
-
-    public short GetID {
-        get { return ID; }
-    }
-
-    public PrefabIDs GetPrefabID {
-        get { return prefabID; }
+    public int GetPrefabID
+    {
+        get { return (int) prefabType; }
     }
 }
