@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -24,6 +25,14 @@ internal partial class Server
     public bool debugMode;
     private bool isStarted;
 
+    //Database stuff
+    private string _constr = "URI=file:NPCMaster.db";
+
+    private IDbConnection _dbc;
+    private IDbCommand _dbcm;
+    private IDataReader _dbr;
+
+    //TODO move somewhere else
     public Transform playerPrefab;
 
     public Transform redBase;
@@ -47,6 +56,7 @@ internal partial class Server
         DESTROYPREFAB,
         TEAMSELECT,
         RESPAWN,
+        WEAPONCHANGE,
 
         //Worldevents
         DROP,
@@ -84,19 +94,25 @@ internal partial class Server
 
         _prefabManager = GameObject.Find("PrefabManager").GetComponent<PrefabManager>();
 
-        serverThread = new Thread(WorkMessages);
-        serverThread.Start();
+        if (ConnectoDB())
+        {
+            serverThread = new Thread(WorkMessages);
+            serverThread.Start();
 
-        //gameThread = new Thread(WorkGameData);
-        //gameThread.Start();
-        isStarted = true;
-        Debug.Log("Server started successfully");
+            //gameThread = new Thread(WorkGameData);
+            //gameThread.Start();
+            isStarted = true;
+            Debug.Log("Server started successfully");
+            return;
+        }
+        if (!isStarted)
+            Debug.Log("Error while starting the server");
     }
 
     private void Update()
     {
         if (!isStarted) return;
-        
+
         CalculatePlayerMovement();
         CalculatePlayerDeathTime();
     }
@@ -123,12 +139,17 @@ internal partial class Server
         return -1;
     }
 
+    private static bool ConnectoDB()
+    {
+        return false;
+    }
+
     //HELPER / UTLITY
     public static Vector3 CalculateDropLocation(Vector3 netObjLoc, int range)
     {
         Random ran = new Random();
         float x = netObjLoc.x + ran.Next(-range, range);
-      
+
         float z = netObjLoc.z + ran.Next(-range, range);
         Debug.Log("X: " + x + "Z: " + z);
         return new Vector3(x, netObjLoc.y, z);

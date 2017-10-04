@@ -1,4 +1,5 @@
-﻿using Lidgren.Network;
+﻿using System;
+using Lidgren.Network;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -43,14 +44,11 @@ internal partial class Server : MonoBehaviour
                 case MoveDirs.NONE:
                     dir = Vector3.zero;
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            if (dir == Vector3.zero)
-                continue;
-
             //position calculation
-           
-          
             _client.animationState = AnimationStates.WALK;
 
             Transform player = clientsTransform[_client.ID];
@@ -60,6 +58,7 @@ internal partial class Server : MonoBehaviour
             _client.Position = player.transform.position;
 
             if (_client.LastPosition == _client.Position) return;
+            
             _client.LastPosition = _client.Position;
             SendPlayerPosition();
         }

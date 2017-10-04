@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Lidgren.Network;
 using UnityEditor.VersionControl;
@@ -167,7 +168,7 @@ internal partial class Server
                     select client.Value).ToList();
                 foreach (ClientData client in _clients)
                 {
-                    if (client.Connection == null || !clientsTransform.ContainsKey(client.ID)) continue;
+                    if (client.Connection == null) continue;
 
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.PLAYERLIST);
@@ -311,7 +312,7 @@ internal partial class Server
             //TODO 
             case 0x8: //addItemRequest / pickup Item
                 //short pickerID = message.ReadInt16();
-                int netID = message.ReadInt16();
+                short netID = message.ReadInt16();
 
                 if (netObjs.ContainsKey(netID) && CanInteract(clients[message.SenderEndPoint], netObjs[netID].Position))
                 {
@@ -319,9 +320,24 @@ internal partial class Server
 
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.PICKUP);
-                    //TODO add item pickup
+                    response.Write(netID);
+                    server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+                    //TODO check 
                 }
                 break;
+                
+                case 0x9: //weapon change event
+                    clients[message.SenderEndPoint].WeaponState = (WeaponState)message.ReadInt16();
+                    response = server.CreateMessage();
+                    response.Write((byte) PacketTypes.WEAPONCHANGE);
+                    response.Write(clients[message.SenderEndPoint].ID);
+                    response.Write((short)clients[message.SenderEndPoint].WeaponState);
+                    server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+                    break;
+                    
+                    case 0x10: //TODO attack (animation + particles)
+                        
+                        break; 
         }
     }
 }
