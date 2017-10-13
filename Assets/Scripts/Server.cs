@@ -109,6 +109,13 @@ internal partial class Server
             Debug.Log("Error while starting the server");
     }
 
+    private static bool ConnectoDB()
+    {
+        //TODO
+        return true;
+    }
+
+
     private void Update()
     {
         if (!isStarted) return;
@@ -139,20 +146,16 @@ internal partial class Server
         return -1;
     }
 
-    private static bool ConnectoDB()
-    {
-        return false;
-    }
 
     //HELPER / UTLITY
     public static Vector3 CalculateDropLocation(Vector3 netObjLoc, int range)
     {
         Random ran = new Random();
         float x = netObjLoc.x + ran.Next(-range, range);
-
+        float y = netObjLoc.y - 0.2f;
         float z = netObjLoc.z + ran.Next(-range, range);
-        Debug.Log("X: " + x + "Z: " + z);
-        return new Vector3(x, netObjLoc.y, z);
+        Debug.Log("X: " + x + "Y: " + y + "Z: " + z);
+        return new Vector3(x, y, z);
     }
 
     //TODO check for interact range (Vector3 target, float range) -> problem with unity multithreading

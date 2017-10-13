@@ -24,11 +24,11 @@ public enum AnimationStates
     ATTACK
 }
 
-
-public enum WeaponState
+public enum WeaponStates
 {
     none,
-    WEAPON,
+    MELEE,
+    BOW,
     UTILITY
 }
 
@@ -69,12 +69,15 @@ public class ClientData
     public AnimationStates animationState { get; set; }
     public MoveDirs moveDir { get; set; }
 
-    public WeaponState WeaponState { get; set; }
+    public WeaponStates WeaponState { get; set; }
 
     public float Speed { get; set; }
     public float DeathTime { get; set; }
+    
     public bool IsDead { get; set; }
     public bool IsAiming { get; set; }
+    public bool canAttack { get; set; }
+    public bool canJump { get; set; }
 
     public static short GetFreeID(IDictionary<IPEndPoint, ClientData> clients)
     {

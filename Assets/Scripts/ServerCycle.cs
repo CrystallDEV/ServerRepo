@@ -85,6 +85,15 @@ internal partial class Server
                     //player leaves the server
                     if (!clients.ContainsKey(message.SenderEndPoint))
                         break;
+                    Debug.Log("removing player ...");
+                    if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
+                    {
+                        clientsTransform.Remove(clients[message.SenderEndPoint].ID);
+                        UnityMainThreadDispatcher.Instance()
+                            .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
+                    }
+                    clients.Remove(message.SenderEndPoint);
+                    Debug.Log("removed player informing other players...");
                     foreach (var client in clients)
                     {
                         if (client.Key.Equals(message.SenderEndPoint) || client.Value.Connection.Equals(null)) continue;
@@ -94,11 +103,6 @@ internal partial class Server
                         response.Write(clients[message.SenderEndPoint].ID);
                         server.SendMessage(response, client.Value.Connection, NetDeliveryMethod.ReliableUnordered);
                     }
-
-                    UnityMainThreadDispatcher.Instance()
-                        .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
-                    clientsTransform.Remove(clients[message.SenderEndPoint].ID);
-                    clients.Remove(message.SenderEndPoint);
                     Debug.Log(message.SenderEndPoint + " disconnected!");
                 }
                 else if (state == NetConnectionStatus.Connected)
@@ -325,19 +329,23 @@ internal partial class Server
                     //TODO check 
                 }
                 break;
-                
-                case 0x9: //weapon change event
-                    clients[message.SenderEndPoint].WeaponState = (WeaponState)message.ReadInt16();
-                    response = server.CreateMessage();
-                    response.Write((byte) PacketTypes.WEAPONCHANGE);
-                    response.Write(clients[message.SenderEndPoint].ID);
-                    response.Write((short)clients[message.SenderEndPoint].WeaponState);
-                    server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
-                    break;
-                    
-                    case 0x10: //TODO attack (animation + particles)
-                        
-                        break; 
+
+            case 0x9: //weapon change event
+                clients[message.SenderEndPoint].WeaponState = (WeaponStates) message.ReadInt16();
+                response = server.CreateMessage();
+                response.Write((byte) PacketTypes.WEAPONCHANGE);
+                response.Write(clients[message.SenderEndPoint].ID);
+                response.Write((short) clients[message.SenderEndPoint].WeaponState);
+                server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+                break;
+
+            case 0x10: //TODO attack (animation + particles)
+
+                break;
+
+            case 0x11:
+
+                break;
         }
     }
 }

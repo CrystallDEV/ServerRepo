@@ -58,9 +58,9 @@ internal partial class Server : MonoBehaviour
             _client.Position = player.transform.position;
 
             if (_client.LastPosition == _client.Position) return;
-            
+
             _client.LastPosition = _client.Position;
-            SendPlayerPosition();
+            SendPlayerPosition(_client);
         }
     }
 
@@ -82,26 +82,22 @@ internal partial class Server : MonoBehaviour
             }
         }
     }
-    
-    private void SendPlayerPosition()
-    {
-        foreach (ClientData _client in clients.Values)
-        {
-            foreach (ClientData allClients in clients.Values)
-            {
-                NetOutgoingMessage response = server.CreateMessage();
-                response.Write((byte) PacketTypes.MOVE);
-                response.Write(_client.ID);
-                response.Write(_client.Position.x);
-                response.Write(_client.Position.y);
-                response.Write(_client.Position.z);
 
-                response.Write(_client.Rotation.x);
-                response.Write(_client.Rotation.y);
-                response.Write(_client.Rotation.z);
-                server.SendMessage(response, allClients.Connection, NetDeliveryMethod.UnreliableSequenced);
-                Debug.Log("Sent position update");
-            }
+    private void SendPlayerPosition(ClientData _client)
+    {
+        foreach (ClientData allClients in clients.Values)
+        {
+            NetOutgoingMessage response = server.CreateMessage();
+            response.Write((byte) PacketTypes.MOVE);
+            response.Write(_client.ID);
+            response.Write(_client.Position.x);
+            response.Write(_client.Position.y);
+            response.Write(_client.Position.z);
+
+            response.Write(_client.Rotation.x);
+            response.Write(_client.Rotation.y);
+            response.Write(_client.Rotation.z);
+            server.SendMessage(response, allClients.Connection, NetDeliveryMethod.UnreliableSequenced);
         }
     }
 
@@ -129,8 +125,16 @@ internal partial class Server : MonoBehaviour
         yield return null;
     }
 
+    public IEnumerator Jump(ClientData _client)
+    {
+        //TODO jump
+        yield return null;
+    }
+
+
     public IEnumerator SpawnPlayer(ClientData _client)
     {
+        if (_client.Team == 0) yield break;
         Transform player = Instantiate(playerPrefab);
         player.name = _client.ID.ToString();
         clientsTransform.Add(_client.ID, player);
@@ -144,7 +148,7 @@ internal partial class Server : MonoBehaviour
                 player.position = blueBase.position;
                 break;
         }
-        
+
         yield return null;
     }
 
@@ -162,7 +166,7 @@ internal partial class Server : MonoBehaviour
 
     public IEnumerator DestroyNetObject(GameObject toDestroy)
     {
-        Destroy(toDestroy);
+        Destroy(toDestroy.gameObject);
         yield return null;
     }
 
@@ -178,6 +182,11 @@ internal partial class Server : MonoBehaviour
     public IEnumerator CalculatePlayerHitpoints(ClientData attacker, ClientData defender)
     {
         //TODO -> Test for different options, if the attack is possible etc. , maybe new Class / method
+        if (clientsTransform[defender.ID] == null)
+        {
+            Debug.Log(attacker.ID + " tried to attack a transform that doesn't exist");
+            yield break;
+        }
         if (Vector3.Distance(attacker.Position, defender.Position) > 10)
         {
             Debug.Log(attacker.ID + " tried to hit another player(" + defender.ID + "), who is out of range");
@@ -205,7 +214,7 @@ internal partial class Server : MonoBehaviour
         }
     }
 
-  
+
     public void CutTree(ClientData client, NetworkObject netObj)
     {
         //TODO
