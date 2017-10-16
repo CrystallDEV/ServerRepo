@@ -1,12 +1,13 @@
 ﻿using Lidgren.Network;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using Utility;
 
 public class NetworkObject : MonoBehaviour
 {
     public PrefabTypes prefabType;
-    
+
     public short ID { get; set; }
 
     public Vector3 LastPosition { get; protected set; }
@@ -28,41 +29,60 @@ public class NetworkObject : MonoBehaviour
         Server.netObjs.Add(ID, this);
         Position = transform.position;
         Rotation = transform.rotation.eulerAngles;
+
+        if (!server.isStarted) return;
+
+        var response = server.server.CreateMessage();
+        response.Write((byte) PacketTypes.SPAWNPREFAB);
+        response.Write(ID);
+        response.Write(GetPrefabId);
+        response.Write(Position.x);
+        response.Write(Position.y);
+        response.Write(Position.z);
+
+        response.Write(Rotation.x);
+        response.Write(Rotation.y);
+        response.Write(Rotation.z);
+
+        server.server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
     }
+
 
     private void Update()
     {
         if (isMoveable)
-            updatePosition();
+            UpdatePosition();
     }
 
-    private void updatePosition()
+    private void UpdatePosition()
     {
         if (transform.position == LastPosition) return;
         LastPosition = transform.position;
         Position = transform.position;
-        foreach (ClientData recipent in server.clients.Values.ToList())
-        {
-            NetOutgoingMessage response = server.server.CreateMessage();
-            response.Write((byte) Server.PacketTypes.UPDATEPREFAB);
-            response.Write(ID);
-            response.Write(transform.position.x);
-            response.Write(transform.position.y);
-            response.Write(transform.position.z);
 
-            response.Write(transform.rotation.x);
-            response.Write(transform.rotation.y);
-            response.Write(transform.rotation.z);
-            server.server.SendMessage(response, recipent.Connection, NetDeliveryMethod.UnreliableSequenced);
-        }
+        NetOutgoingMessage response = server.server.CreateMessage();
+        response.Write((byte) PacketTypes.UPDATEPREFAB);
+        response.Write(ID);
+        response.Write(transform.position.x);
+        response.Write(transform.position.y);
+        response.Write(transform.position.z);
+
+        response.Write(transform.rotation.x);
+        response.Write(transform.rotation.y);
+        response.Write(transform.rotation.z);
+        server.server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
     }
 
     private void OnDestroy()
     {
         Server.netObjs.Remove(ID);
+        var response = server.server.CreateMessage();
+        response.Write((byte) PacketTypes.DESTROYPREFAB);
+        response.Write(ID);
+        server.server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
     }
 
-    public int GetPrefabID
+    public int GetPrefabId
     {
         get { return (int) prefabType; }
     }

@@ -9,6 +9,32 @@ using UnityEngine;
 using Utility;
 using Random = System.Random;
 
+public enum PacketTypes
+{
+    //BASIC TYPES
+    CONNECTED,
+    DISCONNECTED,
+    PLAYERLIST,
+    NEWCLIENT,
+    MOVE,
+    DAMAGE,
+    ANIMATION,
+    TEXTMESSAGE,
+    SPAWNPREFAB,
+    UPDATEPREFAB,
+    DESTROYPREFAB,
+    TEAMSELECT,
+    RESPAWN,
+    WEAPONCHANGE,
+
+    //Worldevents
+    DROP,
+    PICKUP,
+
+    //INTERACTIONS
+    TREECUTTING
+}
+
 internal partial class Server
 {
     private NetPeerConfiguration config;
@@ -23,7 +49,7 @@ internal partial class Server
     //  private Thread gameThread;
 
     public bool debugMode;
-    private bool isStarted;
+    public bool isStarted;
 
     //Database stuff
     private string _constr = "URI=file:NPCMaster.db";
@@ -39,32 +65,6 @@ internal partial class Server
     public Transform blueBase;
 
     private PrefabManager _prefabManager;
-
-    public enum PacketTypes
-    {
-        //BASIC TYPES
-        CONNECTED,
-        DISCONNECTED,
-        PLAYERLIST,
-        NEWCLIENT,
-        MOVE,
-        DAMAGE,
-        ANIMATION,
-        TEXTMESSAGE,
-        SPAWNPREFAB,
-        UPDATEPREFAB,
-        DESTROYPREFAB,
-        TEAMSELECT,
-        RESPAWN,
-        WEAPONCHANGE,
-
-        //Worldevents
-        DROP,
-        PICKUP,
-
-        //INTERACTIONS
-        TREECUTTING
-    }
 
     private void Start()
     {

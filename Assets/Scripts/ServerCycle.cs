@@ -196,7 +196,7 @@ internal partial class Server
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.SPAWNPREFAB);
                     response.Write(netObject.ID);
-                    response.Write(netObject.GetPrefabID);
+                    response.Write(netObject.GetPrefabId);
                     response.Write(netObject.Position.x);
                     response.Write(netObject.Position.y);
                     response.Write(netObject.Position.z);
@@ -268,7 +268,7 @@ internal partial class Server
                 clients[message.SenderEndPoint].Team = message.ReadInt32();
                 UnityMainThreadDispatcher.Instance().Enqueue(SpawnPlayer(clients[message.SenderEndPoint]));
                 //TODO CHECK IF PLAYER CAN JOIN TEAM
-                //TODO ADD TEAM SIZE
+                //TODO ADD TEAM SIZE (arraylist team1,team2)
                 response = server.CreateMessage();
                 response.Write((byte) PacketTypes.TEAMSELECT);
                 response.Write(selectorID);
@@ -292,11 +292,6 @@ internal partial class Server
                     short ID = GetFreeID();
                     UnityMainThreadDispatcher.Instance().Enqueue(DestroyNetObject(netObjs[interactEntityID]));
                     UnityMainThreadDispatcher.Instance().Enqueue(DropItem(PrefabTypes.TREE, dropLocation));
-
-                    response = server.CreateMessage();
-                    response.Write((byte) PacketTypes.DESTROYPREFAB);
-                    response.Write(interactEntityID);
-                    server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
 
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.SPAWNPREFAB);
@@ -340,11 +335,8 @@ internal partial class Server
                 break;
 
             case 0x10: //TODO attack (animation + particles)
-
-                break;
-
-            case 0x11:
-
+                netID = message.ReadInt16();
+                
                 break;
         }
     }
