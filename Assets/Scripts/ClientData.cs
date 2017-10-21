@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using Lidgren.Network;
 using UnityEngine;
+using Utility;
 
 public enum MoveDirs
 {
@@ -41,7 +42,7 @@ public class ClientData
         MaxHitpoints = 50;
         CurrentHitpoints = MaxHitpoints;
         Speed = 6.0f;
-        moveDir = MoveDirs.NONE;
+        MoveDir = MoveDirs.NONE;
     }
 
     public ClientData(short id)
@@ -50,7 +51,7 @@ public class ClientData
         MaxHitpoints = 50;
         CurrentHitpoints = MaxHitpoints;
         Speed = 6.0f;
-        moveDir = MoveDirs.NONE;
+        MoveDir = MoveDirs.NONE;
     }
 
     public short ID { get; private set; }
@@ -64,16 +65,19 @@ public class ClientData
 
     public float CurrentHitpoints { get; set; }
     public float MaxHitpoints { get; set; }
+    public float Speed { get; set; }
+
+    public float DeathTime { get; set; }
     public int Team { get; set; }
 
-    public AnimationStates animationState { get; set; }
-    public MoveDirs moveDir { get; set; }
+    public AnimationStates AnimationState { get; set; }
+    public MoveDirs MoveDir { get; set; }
+
+    public Dictionary<float, MoveState> states { get; set; }
+    public float moveTime { get; set; }
 
     public WeaponStates WeaponState { get; set; }
 
-    public float Speed { get; set; }
-    public float DeathTime { get; set; }
-    
     public bool IsDead { get; set; }
     public bool IsAiming { get; set; }
     public bool canAttack { get; set; }
@@ -87,7 +91,6 @@ public class ClientData
         for (short id = 0; id <= usedIds.Count; id++)
             if (!usedIds.Contains(id))
                 return id;
-
         return -1;
     }
 
@@ -95,9 +98,14 @@ public class ClientData
     {
         return Team != 0;
     }
-    
-    public void resetData()
+
+    public void ResetData()
     {
-        
+        MaxHitpoints = 50;
+        CurrentHitpoints = MaxHitpoints;
+        Speed = 6.0f;
+        MoveDir = MoveDirs.NONE;
+        WeaponState = WeaponStates.none;
+        IsDead = false;
     }
 }

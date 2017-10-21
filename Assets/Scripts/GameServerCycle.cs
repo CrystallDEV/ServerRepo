@@ -1,6 +1,7 @@
 ﻿using System;
 using Lidgren.Network;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Utility;
@@ -15,7 +16,7 @@ internal partial class Server : MonoBehaviour
             if (_client == null || !clientsTransform.ContainsKey(_client.ID)) continue;
 
             Vector3 dir = Vector3.zero;
-            switch (_client.moveDir)
+            switch (_client.MoveDir)
             {
                 case MoveDirs.UP:
                     dir = Vector3.forward;
@@ -49,7 +50,7 @@ internal partial class Server : MonoBehaviour
             }
 
             //position calculation
-            _client.animationState = AnimationStates.WALK;
+            _client.AnimationState = AnimationStates.WALK;
 
             Transform player = clientsTransform[_client.ID];
             player.rotation = Quaternion.Euler(_client.Rotation);
@@ -219,4 +220,14 @@ internal partial class Server : MonoBehaviour
     {
         //TODO
     }
+
+
+    #region Movement
+
+    public void Move()
+    {
+        
+    }
+    
+    #endregion
 }

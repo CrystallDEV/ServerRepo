@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="dafbaf11-80ed-4dbe-ab8e-f8e29deb2ceb" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Assets/Scripts/Utility/MoveState.cs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Assets/Scripts/Utility/moveState.cs.meta" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Scripts/ClientData.cs" afterPath="$PROJECT_DIR$/Assets/Scripts/ClientData.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs" afterPath="$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Scripts/Server.cs" afterPath="$PROJECT_DIR$/Assets/Scripts/Server.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs" afterPath="$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs" />
+    </list>
+    <ignored path="$PROJECT_DIR$/Library/" />
+    <ignored path="$PROJECT_DIR$/Temp/" />
+    <ignored path="$PROJECT_DIR$/obj/" />
+    <ignored path="$PROJECT_DIR$/packages/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="ClientData.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/ClientData.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="189">
+              <caret line="76" column="21" lean-forward="false" selection-start-line="76" selection-start-column="21" selection-end-line="76" selection-end-column="21" />
+              <folding>
+                <marker date="1508251598629" expanded="true" signature="6:127" ph="..." />
+                <marker date="1508251598629" expanded="true" signature="149:255" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="284:319" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="345:391" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="416:2437" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="476:661" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="694:846" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="1859:2141" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="2168:2206" ph="{...}" />
+                <marker date="1508251598629" expanded="true" signature="2235:2435" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameServerCycle.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2625">
+              <caret line="131" column="26" lean-forward="false" selection-start-line="131" selection-start-column="26" selection-end-line="131" selection-end-column="26" />
+              <folding>
+                <marker date="1508250700692" expanded="false" signature="6:149" ph="..." />
+                <marker date="1508250700692" expanded="true" signature="196:7130" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="271:2203" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="341:2197" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="517:1651" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2248:2779" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2318:2773" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2430:2511" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2528:2763" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2836:3478" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="2900:3472" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="3534:4034" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="4090:4265" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="4314:4373" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="4430:4905" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="4660:4871" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="4967:5045" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="5111:5189" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="5252:5330" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="5394:5553" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="5688:6946" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="5849:5982" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="6055:6211" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="6255:6447" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="6591:6862" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="6875:6940" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="7013:7040" ph="{...}" />
+                <marker date="1508250700692" expanded="true" signature="7047:7128" ph="Movement" />
+                <marker date="1508250700692" expanded="true" signature="7087:7108" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MoveState.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/Utility/MoveState.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="10" column="63" lean-forward="false" selection-start-line="10" selection-start-column="63" selection-end-line="10" selection-end-column="63" />
+              <folding>
+                <marker date="1508251974793" expanded="true" signature="37:351" ph="{...}" />
+                <marker date="1508251974793" expanded="true" signature="66:349" ph="{...}" />
+                <marker date="1508251974793" expanded="true" signature="231:343" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Server.cs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/Server.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="108" column="9" lean-forward="true" selection-start-line="108" selection-start-column="9" selection-end-line="108" selection-end-column="9" />
+              <folding>
+                <marker date="1508253066636" expanded="false" signature="6:214" ph="..." />
+                <marker date="1508253066636" expanded="true" signature="239:557" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="588:4259" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="1426:2747" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="1612:2108" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="1942:2025" ph="/* config.SimulatedRandomLatency = 0.6f; ... */" />
+                <marker date="1508253066636" expanded="true" signature="2137:2243" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="2360:2659" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="2471:2545" ph="/* gameThread = new Thread(WorkGameData); ... */" />
+                <marker date="1508253066636" expanded="true" signature="2785:2833" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="2861:2976" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="3004:3227" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="3078:3128" ph="/* gameThread.Abort(); ... */" />
+                <marker date="1508253066636" expanded="true" signature="3264:3540" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="3641:3931" ph="{...}" />
+                <marker date="1508253066636" expanded="true" signature="4109:4257" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ServerCycle.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="334">
+              <caret line="167" column="57" lean-forward="false" selection-start-line="167" selection-start-column="57" selection-end-line="167" selection-end-column="57" />
+              <folding>
+                <marker date="1508252673591" expanded="true" signature="6:133" ph="..." />
+                <marker date="1508252673591" expanded="true" signature="164:16261" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="171:975" ph="/* Server| ... */" />
+                <marker date="1508252673591" expanded="true" signature="1007:1251" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="1197:1245" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="1284:7017" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="1476:7011" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="2121:2412" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="3233:4645" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="3539:3839" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="4027:4553" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="4710:6858" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="5750:6677" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="7087:16259" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="7202:16253" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="8247:9051" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="9110:9883" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="10519:10889" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="11361:11737" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="12052:12443" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="12773:12870" ph="/* TODO CHECK IF PLAYER CAN JOIN TEAM ... */" />
+                <marker date="1508252673591" expanded="true" signature="13557:14820" ph="{...}" />
+                <marker date="1508252673591" expanded="true" signature="15145:15573" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>animationState</find>
+      <find>move</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>AnimationState</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Server.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ClientData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Utility/MoveState.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/Assets/Scripts/Utility/moveState.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Utility/StateHandler.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ClientData.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Utility/MoveState.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Server.cs" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="11" />
+    <option name="width" value="1918" />
+    <option name="height" value="1028" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="SolutionExplorer" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="SolutionExplorer">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Scripts" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Scripts" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Utility" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Scripts" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Item" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Scripts" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Buildings" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assets" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Scripts" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Buildings" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Base" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pixelserverrepo (2 projects)" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Assembly-CSharp" />
+              <option name="myItemType" value="com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <option name="show-file-system" value="false" />
+        <option name="show-all-items" value="false" />
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="SearchEverywhereHistoryKey" value="servercyc&#9;FILE&#9;file://C:/Users/marek.hasselder/Documents/pixelserverrepo/Assets/Scripts/ServerCycle.cs" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Unity Debug.Attach to Unity Editor">
+    <configuration default="true" type="DotNetProject" factoryName=".NET Project">
+      <option name="PROJECT_PATH" value="" />
+      <option name="PROJECT_KIND" value="None" />
+      <option name="PROJECT_TFM" value="" />
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="USE_MONO" value="0" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug">
+      <method />
+    </configuration>
+    <configuration default="false" name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug">
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Unity Debug.Attach to Unity Editor" />
+    </list>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="dafbaf11-80ed-4dbe-ab8e-f8e29deb2ceb" name="Default" comment="" />
+      <created>1508235126630</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1508235126630</updated>
+      <workItem from="1508235129074" duration="7648000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="7648000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="11" y="0" width="1918" height="1028" extended-state="1" />
+    <layout>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3371958" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2562432" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973147" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/Utility/StateHandler.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="4" column="8" lean-forward="false" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/ClientData.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="76" column="21" lean-forward="false" selection-start-line="76" selection-start-column="21" selection-end-line="76" selection-end-column="21" />
+          <folding>
+            <marker date="1508251598629" expanded="true" signature="6:127" ph="..." />
+            <marker date="1508251598629" expanded="true" signature="149:255" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="284:319" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="345:391" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="416:2437" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="476:661" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="694:846" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="1859:2141" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="2168:2206" ph="{...}" />
+            <marker date="1508251598629" expanded="true" signature="2235:2435" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/Utility/MoveState.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="10" column="63" lean-forward="false" selection-start-line="10" selection-start-column="63" selection-end-line="10" selection-end-column="63" />
+          <folding>
+            <marker date="1508251974793" expanded="true" signature="37:351" ph="{...}" />
+            <marker date="1508251974793" expanded="true" signature="66:349" ph="{...}" />
+            <marker date="1508251974793" expanded="true" signature="231:343" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/ServerCycle.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="334">
+          <caret line="167" column="57" lean-forward="false" selection-start-line="167" selection-start-column="57" selection-end-line="167" selection-end-column="57" />
+          <folding>
+            <marker date="1508252673591" expanded="true" signature="6:133" ph="..." />
+            <marker date="1508252673591" expanded="true" signature="164:16261" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="171:975" ph="/* Server| ... */" />
+            <marker date="1508252673591" expanded="true" signature="1007:1251" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="1197:1245" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="1284:7017" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="1476:7011" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="2121:2412" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="3233:4645" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="3539:3839" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="4027:4553" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="4710:6858" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="5750:6677" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="7087:16259" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="7202:16253" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="8247:9051" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="9110:9883" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="10519:10889" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="11361:11737" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="12052:12443" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="12773:12870" ph="/* TODO CHECK IF PLAYER CAN JOIN TEAM ... */" />
+            <marker date="1508252673591" expanded="true" signature="13557:14820" ph="{...}" />
+            <marker date="1508252673591" expanded="true" signature="15145:15573" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/GameServerCycle.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2625">
+          <caret line="131" column="26" lean-forward="false" selection-start-line="131" selection-start-column="26" selection-end-line="131" selection-end-column="26" />
+          <folding>
+            <marker date="1508250700692" expanded="false" signature="6:149" ph="..." />
+            <marker date="1508250700692" expanded="true" signature="196:7130" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="271:2203" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="341:2197" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="517:1651" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2248:2779" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2318:2773" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2430:2511" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2528:2763" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2836:3478" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="2900:3472" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="3534:4034" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="4090:4265" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="4314:4373" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="4430:4905" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="4660:4871" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="4967:5045" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="5111:5189" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="5252:5330" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="5394:5553" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="5688:6946" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="5849:5982" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="6055:6211" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="6255:6447" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="6591:6862" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="6875:6940" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="7013:7040" ph="{...}" />
+            <marker date="1508250700692" expanded="true" signature="7047:7128" ph="Movement" />
+            <marker date="1508250700692" expanded="true" signature="7087:7108" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/Server.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="108" column="9" lean-forward="true" selection-start-line="108" selection-start-column="9" selection-end-line="108" selection-end-column="9" />
+          <folding>
+            <marker date="1508253066636" expanded="false" signature="6:214" ph="..." />
+            <marker date="1508253066636" expanded="true" signature="239:557" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="588:4259" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="1426:2747" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="1612:2108" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="1942:2025" ph="/* config.SimulatedRandomLatency = 0.6f; ... */" />
+            <marker date="1508253066636" expanded="true" signature="2137:2243" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="2360:2659" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="2471:2545" ph="/* gameThread = new Thread(WorkGameData); ... */" />
+            <marker date="1508253066636" expanded="true" signature="2785:2833" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="2861:2976" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="3004:3227" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="3078:3128" ph="/* gameThread.Abort(); ... */" />
+            <marker date="1508253066636" expanded="true" signature="3264:3540" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="3641:3931" ph="{...}" />
+            <marker date="1508253066636" expanded="true" signature="4109:4257" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

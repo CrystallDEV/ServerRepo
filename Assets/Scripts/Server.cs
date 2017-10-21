@@ -51,7 +51,7 @@ internal partial class Server
     public bool debugMode;
     public bool isStarted;
 
-    //Database stuff
+    //Database stuff TODO
     private string _constr = "URI=file:NPCMaster.db";
 
     private IDbConnection _dbc;
@@ -65,6 +65,8 @@ internal partial class Server
     public Transform blueBase;
 
     private PrefabManager _prefabManager;
+
+    public float serverTime;
 
     private void Start()
     {
@@ -119,7 +121,6 @@ internal partial class Server
     private void Update()
     {
         if (!isStarted) return;
-
         CalculatePlayerMovement();
         CalculatePlayerDeathTime();
     }
@@ -145,7 +146,6 @@ internal partial class Server
 
         return -1;
     }
-
 
     //HELPER / UTLITY
     public static Vector3 CalculateDropLocation(Vector3 netObjLoc, int range)

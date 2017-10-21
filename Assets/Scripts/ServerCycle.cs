@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Lidgren.Network;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using Utility;
 
@@ -155,14 +153,19 @@ internal partial class Server
 
     private void ProcessMessage(byte id, NetIncomingMessage message)
     {
-        //Protokoll : [Byte], [Value], [Value]
+        //Protokoll : [Byte], [Value], [Value], ...
         NetOutgoingMessage response;
         switch (id)
         {
-            case 0x0: //0x0 steht für Positions-Informationen eines Clienten
-                clients[message.SenderEndPoint].moveDir = (MoveDirs) message.ReadInt32();
-                clients[message.SenderEndPoint].Rotation =
-                    new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
+            case 0x0: //positionupdate
+                ClientData _client = clients[message.SenderEndPoint];
+                _client.MoveDir = (MoveDirs) message.ReadInt32();
+                _client.Rotation = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
+
+                MoveState moveState = new MoveState(_client.MoveDir, _client.Position, _client.Rotation);
+                clients[message.SenderEndPoint].states.Add(_client.moveTime, moveState);
+                _client.moveTime++;
+                Debug.Log("movetime: " + _client.moveTime);
                 break;
 
             //TODO RENAME TO GAMESTATE, since it now updates the gamestate?
@@ -233,7 +236,7 @@ internal partial class Server
 
             case 0x4: //update animation
                 ClientData animPlayer = clients[message.SenderEndPoint];
-                animPlayer.animationState = (AnimationStates) message.ReadInt32();
+                animPlayer.AnimationState = (AnimationStates) message.ReadInt32();
 
                 List<ClientData> _others = (from client in clients
                     where (client).Value.ID != clients[message.SenderEndPoint].ID
@@ -243,7 +246,7 @@ internal partial class Server
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.ANIMATION);
                     response.Write(animPlayer.ID);
-                    response.Write((int) animPlayer.animationState);
+                    response.Write((int) animPlayer.AnimationState);
                     server.SendMessage(response, c.Connection, NetDeliveryMethod.ReliableOrdered);
                 }
                 break;
@@ -311,15 +314,15 @@ internal partial class Server
             //TODO 
             case 0x8: //addItemRequest / pickup Item
                 //short pickerID = message.ReadInt16();
-                short netID = message.ReadInt16();
+                short netId = message.ReadInt16();
 
-                if (netObjs.ContainsKey(netID) && CanInteract(clients[message.SenderEndPoint], netObjs[netID].Position))
+                if (netObjs.ContainsKey(netId) && CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
                 {
-                    UnityMainThreadDispatcher.Instance().Enqueue(DestroyNetObject(netObjs[netID].gameObject));
+                    UnityMainThreadDispatcher.Instance().Enqueue(DestroyNetObject(netObjs[netId].gameObject));
 
                     response = server.CreateMessage();
                     response.Write((byte) PacketTypes.PICKUP);
-                    response.Write(netID);
+                    response.Write(netId);
                     server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                     //TODO check 
                 }
@@ -335,8 +338,8 @@ internal partial class Server
                 break;
 
             case 0x10: //TODO attack (animation + particles)
-                netID = message.ReadInt16();
-                
+                netId = message.ReadInt16();
+
                 break;
         }
     }
