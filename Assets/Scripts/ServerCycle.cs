@@ -161,6 +161,11 @@ internal partial class Server
                 ClientData _client = clients[message.SenderEndPoint];
                 _client.MoveDir = (MoveDirs) message.ReadInt32();
                 _client.Rotation = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
+                float moveTime = message.ReadFloat();
+                if (_client.moveTime != moveTime)
+                {
+                    Debug.Log("movetime mismatch from client " + _client.UserName + ":" + _client.ID);
+                }
 
                 MoveState moveState = new MoveState(_client.MoveDir, _client.Position, _client.Rotation);
                 clients[message.SenderEndPoint].states.Add(_client.moveTime, moveState);

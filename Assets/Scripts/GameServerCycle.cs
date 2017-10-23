@@ -86,20 +86,17 @@ internal partial class Server : MonoBehaviour
 
     private void SendPlayerPosition(ClientData _client)
     {
-        foreach (ClientData allClients in clients.Values)
-        {
-            NetOutgoingMessage response = server.CreateMessage();
-            response.Write((byte) PacketTypes.MOVE);
-            response.Write(_client.ID);
-            response.Write(_client.Position.x);
-            response.Write(_client.Position.y);
-            response.Write(_client.Position.z);
+        NetOutgoingMessage response = server.CreateMessage();
+        response.Write((byte) PacketTypes.MOVE);
+        response.Write(_client.ID);
+        response.Write(_client.Position.x);
+        response.Write(_client.Position.y);
+        response.Write(_client.Position.z);
 
-            response.Write(_client.Rotation.x);
-            response.Write(_client.Rotation.y);
-            response.Write(_client.Rotation.z);
-            server.SendMessage(response, allClients.Connection, NetDeliveryMethod.UnreliableSequenced);
-        }
+        response.Write(_client.Rotation.x);
+        response.Write(_client.Rotation.y);
+        response.Write(_client.Rotation.z);
+        server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
     }
 
     private void SendPlayerRespawn(ClientData _client)
@@ -226,8 +223,7 @@ internal partial class Server : MonoBehaviour
 
     public void Move()
     {
-        
     }
-    
+
     #endregion
 }
