@@ -72,8 +72,7 @@ public class ClientData
 
     public AnimationStates AnimationState { get; set; }
     public MoveDirs MoveDir { get; set; }
-
-    public Dictionary<float, MoveState> states { get; set; }
+    
     public float moveTime { get; set; }
 
     public WeaponStates WeaponState { get; set; }

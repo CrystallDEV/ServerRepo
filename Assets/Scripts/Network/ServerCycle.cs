@@ -164,13 +164,9 @@ internal partial class Server
                 float moveTime = message.ReadFloat();
                 if (_client.moveTime != moveTime)
                 {
-                    Debug.Log("movetime mismatch from client " + _client.UserName + ":" + _client.ID);
+                    Debug.Log("movetime mismatch from client " + _client.UserName + ":" + _client.ID + ". Client movetime: " + moveTime + " - server movetime: " + _client.moveTime);
+                    //TODO propably update client movetime so the client matches the server movetime
                 }
-
-                MoveState moveState = new MoveState(_client.MoveDir, _client.Position, _client.Rotation);
-                clients[message.SenderEndPoint].states.Add(_client.moveTime, moveState);
-                _client.moveTime++;
-                Debug.Log("movetime: " + _client.moveTime);
                 break;
 
             //TODO RENAME TO GAMESTATE, since it now updates the gamestate?

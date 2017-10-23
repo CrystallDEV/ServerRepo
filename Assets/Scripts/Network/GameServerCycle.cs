@@ -96,7 +96,9 @@ internal partial class Server : MonoBehaviour
         response.Write(_client.Rotation.x);
         response.Write(_client.Rotation.y);
         response.Write(_client.Rotation.z);
+        response.Write(_client.moveTime);
         server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
+        _client.moveTime++;
     }
 
     private void SendPlayerRespawn(ClientData _client)
