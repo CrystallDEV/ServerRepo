@@ -164,8 +164,16 @@ internal partial class Server
                 float movetime = message.ReadFloat();
                 if (movetime != _client.moveTime)
                 {
+<<<<<<< HEAD
                     Debug.Log("Client movetime mismatch!");
+=======
+                    Debug.Log("movetime mismatch from client " + _client.UserName + ":" + _client.ID +
+                              ". Client movetime: " + moveTime + " - server movetime: " + _client.moveTime);
+                    //TODO propably update client movetime so the client matches the server movetime -> for now just for debugging
+>>>>>>> 8323f63bfcdaf65852cb7fffafe3b4f375e6cc12
                 }
+                //TODO change the whole process so you can rely on the input sent to the player
+                UnityMainThreadDispatcher.Instance().Enqueue(CalculatePlayerMovement(_client));
                 break;
 
             //TODO RENAME TO GAMESTATE, since it now updates the gamestate?
