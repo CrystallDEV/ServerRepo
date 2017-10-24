@@ -121,7 +121,7 @@ internal partial class Server
     private void Update()
     {
         if (!isStarted) return;
-        SendPlayerPosition();
+        CalculatePlayerMovement();
         CalculatePlayerDeathTime();
     }
 
