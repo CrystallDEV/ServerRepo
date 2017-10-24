@@ -22,25 +22,25 @@ internal partial class Server : MonoBehaviour
                     dir = Vector3.forward;
                     break;
                 case MoveDirs.UPRIGHT:
-                    dir = (Vector3.forward + Vector3.right);
+                    dir = Vector3.forward + Vector3.right;
                     break;
                 case MoveDirs.RIGHT:
                     dir = Vector3.right;
                     break;
                 case MoveDirs.RIGHTDOWN:
-                    dir = (Vector3.back + Vector3.right);
+                    dir = Vector3.back + Vector3.right;
                     break;
                 case MoveDirs.DOWN:
                     dir = Vector3.back;
                     break;
                 case MoveDirs.DOWNLEFT:
-                    dir = (Vector3.back + Vector3.left);
+                    dir = Vector3.back + Vector3.left;
                     break;
                 case MoveDirs.LEFT:
                     dir = Vector3.left;
                     break;
                 case MoveDirs.LEFTUP:
-                    dir = (Vector3.left + Vector3.forward);
+                    dir = Vector3.left + Vector3.forward;
                     break;
                 case MoveDirs.NONE:
                     dir = Vector3.zero;
@@ -59,7 +59,7 @@ internal partial class Server : MonoBehaviour
             _client.Position = player.transform.position;
 
             if (_client.LastPosition == _client.Position) return;
-
+            _client.moveTime++;
             _client.LastPosition = _client.Position;
             SendPlayerPosition(_client);
         }
@@ -98,7 +98,6 @@ internal partial class Server : MonoBehaviour
         response.Write(_client.Rotation.z);
         response.Write(_client.moveTime);
         server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
-        _client.moveTime++;
     }
 
     private void SendPlayerRespawn(ClientData _client)
@@ -219,13 +218,4 @@ internal partial class Server : MonoBehaviour
     {
         //TODO
     }
-
-
-    #region Movement
-
-    public void Move()
-    {
-    }
-
-    #endregion
 }

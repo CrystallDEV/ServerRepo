@@ -161,18 +161,17 @@ internal partial class Server
                 ClientData _client = clients[message.SenderEndPoint];
                 _client.MoveDir = (MoveDirs) message.ReadInt32();
                 _client.Rotation = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
-                float moveTime = message.ReadFloat();
-                if (_client.moveTime != moveTime)
+                float movetime = message.ReadFloat();
+                if (movetime != _client.moveTime)
                 {
-                    Debug.Log("movetime mismatch from client " + _client.UserName + ":" + _client.ID + ". Client movetime: " + moveTime + " - server movetime: " + _client.moveTime);
-                    //TODO propably update client movetime so the client matches the server movetime
+                    Debug.Log("Client movetime mismatch!");
                 }
                 break;
 
             //TODO RENAME TO GAMESTATE, since it now updates the gamestate?
             case 0x1: //Client fordert eine komplette Liste aller Clients mit deren ID und Position
                 List<ClientData> _clients = (from client in clients
-                    where (client).Value.ID != clients[message.SenderEndPoint].ID
+                    where client.Value.ID != clients[message.SenderEndPoint].ID
                     select client.Value).ToList();
                 foreach (ClientData client in _clients)
                 {
@@ -254,7 +253,7 @@ internal partial class Server
 
             case 0x5: //chat event
                 List<ClientData> recipents = (from client in clients
-                    where (client).Value.ID != clients[message.SenderEndPoint].ID
+                    where client.Value.ID != clients[message.SenderEndPoint].ID
                     select client.Value).ToList();
                 foreach (ClientData rec in recipents)
                 {
