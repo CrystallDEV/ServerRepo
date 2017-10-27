@@ -164,7 +164,7 @@ internal partial class Server
                 float movetime = message.ReadFloat();
                 if (movetime != _client.moveTime)
                 {
-                    Debug.Log("Client movetime mismatch!");
+                    Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " + _client.moveTime);
                 }
                 break;
 

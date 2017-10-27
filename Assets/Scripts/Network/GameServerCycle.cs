@@ -64,7 +64,7 @@ internal partial class Server : MonoBehaviour
             player.Translate(dir.normalized * _client.Speed * Time.deltaTime, Space.World);
             _client.Position = player.transform.position;
 
-            if (_client.LastPosition == _client.Position) return;
+            if (_client.LastPosition.Equals(_client.Position)) return;
             _client.moveTime++;
             _client.LastPosition = _client.Position;
             SendPlayerPosition(_client);
