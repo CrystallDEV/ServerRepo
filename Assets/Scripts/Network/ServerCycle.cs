@@ -56,7 +56,7 @@ internal partial class Server
                 Debug.Log(message.ReadString());
                 break;
             case NetIncomingMessageType.DiscoveryRequest:
-                //Ein Client will connecten -> Erlauben und antworten
+                //Answer discoveryrequest from client and allow to connect
                 if (!clients.ContainsKey(message.SenderEndPoint))
                 {
                     response = server.CreateMessage("CrystallStudios-GameServer");
@@ -66,17 +66,15 @@ internal partial class Server
                 }
                 break;
             case NetIncomingMessageType.ConnectionApproval:
-                //Clients die Connecten wollen dies erlauben
+                //Accept new clients that are trying to connect
                 message.SenderConnection.Approve();
                 Debug.Log(message.SenderEndPoint + " approved.");
                 break;
             case NetIncomingMessageType.Data:
-                //Sämtliche Daten die Clients senden annehmen
                 byte type = message.ReadByte();
                 ProcessMessage(type, message);
                 break;
             case NetIncomingMessageType.StatusChanged:
-                //Falls ein Client connected / disconnected
                 NetConnectionStatus state = (NetConnectionStatus) message.ReadByte();
                 if (state == NetConnectionStatus.Disconnected || state == NetConnectionStatus.Disconnecting)
                 {
@@ -86,16 +84,16 @@ internal partial class Server
                     Debug.Log("removing player ...");
                     if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
                     {
-                        clientsTransform.Remove(clients[message.SenderEndPoint].ID);
                         UnityMainThreadDispatcher.Instance()
                             .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
+                        clientsTransform.Remove(clients[message.SenderEndPoint].ID);
                     }
                     clients.Remove(message.SenderEndPoint);
                     Debug.Log("removed player informing other players...");
                     foreach (var client in clients)
                     {
                         if (client.Key.Equals(message.SenderEndPoint) || client.Value.Connection.Equals(null)) continue;
-
+                        Debug.Log("informed client (" + client.Value.ID + ") that another client disconnected");
                         response = server.CreateMessage();
                         response.Write((byte) PacketTypes.DISCONNECTED); //0x01: Ein Client hat disconnected
                         response.Write(clients[message.SenderEndPoint].ID);
@@ -112,8 +110,7 @@ internal partial class Server
                     Debug.Log("Created client with id '" + newClient.ID + "'!");
 
                     response = server.CreateMessage();
-                    response.Write((byte) PacketTypes
-                        .CONNECTED); //0x02: Clientinformation um neuen Clienten seine ID mitzuteilen
+                    response.Write((byte) PacketTypes.CONNECTED);
                     response.Write(newClient.ID);
                     response.Write((short) clients.Count); //Anzahl aktueller Clients senden
                     server.SendMessage(response, message.SenderConnection, NetDeliveryMethod.ReliableUnordered);
@@ -125,7 +122,7 @@ internal partial class Server
                     {
                         if (client.Key.Equals(message.SenderEndPoint)) continue;
 
-                        //Alle clients informieren, dass ein neuer connected
+                        //Tell all clients, a new client connected
                         response = server.CreateMessage();
                         response.Write((byte) PacketTypes.NEWCLIENT); //0x00: Neuer Client connected
                         response.Write(newClient.ID); //Seine ID mitteilen
@@ -164,12 +161,13 @@ internal partial class Server
                 float movetime = message.ReadFloat();
                 if (movetime != _client.moveTime)
                 {
-                    Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " + _client.moveTime);
+                    Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " +
+                              _client.moveTime);
                 }
                 break;
 
             //TODO RENAME TO GAMESTATE, since it now updates the gamestate?
-            case 0x1: //Client fordert eine komplette Liste aller Clients mit deren ID und Position
+            case 0x1:
                 List<ClientData> _clients = (from client in clients
                     where client.Value.ID != clients[message.SenderEndPoint].ID
                     select client.Value).ToList();
@@ -218,7 +216,7 @@ internal partial class Server
 
             case 0x3: //statsUpdate
                 short defenderID = message.ReadInt16();
-                ClientData defender = (from client in clients where (client).Value.ID == defenderID select client.Value)
+                ClientData defender = (from client in clients where client.Value.ID == defenderID select client.Value)
                     .ToList()[0];
                 ClientData attacker = clients[message.SenderEndPoint];
                 UnityMainThreadDispatcher.Instance().Enqueue(CalculatePlayerHitpoints(attacker, defender));
@@ -311,8 +309,8 @@ internal partial class Server
                     server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                 }
                 break;
-            //TODO 
             case 0x8: //addItemRequest / pickup Item
+                //TODO add picker 
                 //short pickerID = message.ReadInt16();
                 short netId = message.ReadInt16();
 
@@ -324,7 +322,7 @@ internal partial class Server
                     response.Write((byte) PacketTypes.PICKUP);
                     response.Write(netId);
                     server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
-                    //TODO check 
+                    //TODO check add inventory attribute to the clientdata
                 }
                 break;
 
@@ -337,7 +335,7 @@ internal partial class Server
                 server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                 break;
 
-            case 0x10: //TODO attack (animation + particles)
+            case 0x10: //spawn 
                 netId = message.ReadInt16();
 
                 break;
