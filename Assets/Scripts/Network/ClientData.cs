@@ -39,19 +39,13 @@ public class ClientData
     {
         Connection = connection;
         ID = id;
-        MaxHitpoints = 50;
-        CurrentHitpoints = MaxHitpoints;
-        Speed = 6.0f;
-        MoveDir = MoveDirs.NONE;
+        ResetData();
     }
 
     public ClientData(short id)
     {
         ID = id;
-        MaxHitpoints = 50;
-        CurrentHitpoints = MaxHitpoints;
-        Speed = 6.0f;
-        MoveDir = MoveDirs.NONE;
+        ResetData();
     }
 
     public short ID { get; private set; }
@@ -72,7 +66,7 @@ public class ClientData
 
     public AnimationStates AnimationState { get; set; }
     public MoveDirs MoveDir { get; set; }
-    
+
     public float moveTime { get; set; }
 
     public WeaponStates WeaponState { get; set; }
@@ -81,6 +75,9 @@ public class ClientData
     public bool IsAiming { get; set; }
     public bool canAttack { get; set; }
     public bool canJump { get; set; }
+
+    public bool WantsPredict { get; set; }
+
 
     public static short GetFreeID(IDictionary<IPEndPoint, ClientData> clients)
     {
@@ -106,5 +103,6 @@ public class ClientData
         MoveDir = MoveDirs.NONE;
         WeaponState = WeaponStates.none;
         IsDead = false;
+        WantsPredict = false;
     }
 }

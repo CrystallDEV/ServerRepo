@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Utility
+namespace Network
 {
     public class MoveState
     {
