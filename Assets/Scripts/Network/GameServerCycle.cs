@@ -4,7 +4,6 @@ using System.Linq;
 using Lidgren.Network;
 using UnityEngine;
 using Utility;
-using Object = UnityEngine.Object;
 
 namespace Network
 {
