@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -52,13 +51,6 @@ namespace Network
 
         public bool debugMode;
         public bool isStarted;
-
-        //Database stuff TODO
-        private string _constr = "URI=file:NPCMaster.db";
-
-        private IDbConnection _dbc;
-        private IDbCommand _dbcm;
-        private IDataReader _dbr;
 
         //TODO move somewhere else
         public Transform playerPrefab;

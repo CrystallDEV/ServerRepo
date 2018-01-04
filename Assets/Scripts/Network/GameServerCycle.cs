@@ -56,7 +56,7 @@ namespace Network
                 player.Translate(dir.normalized * _client.Speed * Time.deltaTime, Space.World);
                 _client.Position = player.transform.position;
 
-                if (_client.LastPosition == _client.Position) return;
+                if (_client.LastPosition == _client.Position) continue;
                 if (_client.WantsPredict)
                 {
                     _client.moveTime++;
