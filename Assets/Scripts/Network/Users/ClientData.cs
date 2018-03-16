@@ -2,36 +2,11 @@
 using System.Linq;
 using System.Net;
 using Lidgren.Network;
+using Network.Animation;
+using Network.Movement;
+using Network.Teams;
+using Network.Weapons;
 using UnityEngine;
-using Utility;
-
-public enum MoveDirs
-{
-    UP,
-    UPRIGHT,
-    RIGHT,
-    RIGHTDOWN,
-    DOWN,
-    DOWNLEFT,
-    LEFT,
-    LEFTUP,
-    NONE
-}
-
-public enum AnimationStates
-{
-    IDLE,
-    WALK,
-    ATTACK
-}
-
-public enum WeaponStates
-{
-    none,
-    MELEE,
-    BOW,
-    UTILITY
-}
 
 public class ClientData
 {
@@ -62,7 +37,7 @@ public class ClientData
     public float Speed { get; set; }
 
     public float DeathTime { get; set; }
-    public int Team { get; set; }
+    public Team Team { get; set; }
 
     public AnimationStates AnimationState { get; set; }
     public MoveDirs MoveDir { get; set; }
@@ -92,7 +67,7 @@ public class ClientData
 
     public bool HasTeam()
     {
-        return Team != 0;
+        return Team != null;
     }
 
     public void ResetData()

@@ -1,8 +1,14 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Lidgren.Network;
+using Network.Animation;
+using Network.Health;
+using Network.Movement;
+using Network.Packets;
+using Network.Teams;
+using Network.Weapons;
 using UnityEngine;
 using Utility;
 
@@ -10,28 +16,8 @@ namespace Network
 {
     internal partial class Server
     {
-        //        Server|
-        //-------
-        //0x00: Client connected (wird an alle Clients versendet)
-        //0x01: Client disconnected (wird an alle Clients versendet)
-        //0x02: Client-Information für connectenden Client: Teilt ihm seine ID mit
-        //0x03: Client hat Spieler x gehitted
-        //0x04: Client hat Item X benutzt
-        //0x05: Client hat zu Waffe X gewechselt
-        //0x06: Client hat seine Todeszeit nachgefragt, wenn lebt -> sende respawn
-
-        //0x10: Positionsänderung (wird an alle Clients versendet)
-        //0x11: Liste aller Clients (ID und Position) für einen neu-verbundenen Client
-        //0x12: Akualisiere GameData (GameTime)
-        //0x13: Sende Spieler X wurde getroffen
-        //0x14: Sende Spieler X hat Item Y benutzt
-        //0x15: Sende Spieler X hat zu Waffe Y gewechselt
-        //0x16: RespawnPlayerz
-
         public void WorkMessages()
         {
-            //Message-Cycle: Dauerhaft Messages verarbeiten, bis das Programm beendet wird bzw. ein Fehler auftritt
-
             while (serverThread.ThreadState != ThreadState.AbortRequested)
             {
                 ReadMessages();
@@ -81,26 +67,34 @@ namespace Network
                     NetConnectionStatus state = (NetConnectionStatus) message.ReadByte();
                     if (state == NetConnectionStatus.Disconnected || state == NetConnectionStatus.Disconnecting)
                     {
+                        //TODO SendPlayerDisconnect
                         //player leaves the server
                         if (!clients.ContainsKey(message.SenderEndPoint))
                             break;
-                        Debug.Log("removing player ...");
-                        if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
+                        ClientData disconnectClientData = clients[message.SenderEndPoint];
+                        Debug.Log(
+                            "Player disconnected: " + disconnectClientData.UserName + "(" + disconnectClientData.ID +
+                            ")"
+                        );
+                        try
                         {
-                            UnityMainThreadDispatcher.Instance()
-                                .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
-                            clientsTransform.Remove(clients[message.SenderEndPoint].ID);
+                            if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
+                            {
+                                UnityMainThreadDispatcher.Instance()
+                                    .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
+                                clientsTransform.Remove(clients[message.SenderEndPoint].ID);
+                            }
                         }
-                        Debug.Log("removed player informing other players...");
+                        catch (Exception ex)
+                        {
+                            Debug.LogError(ex.StackTrace);
+                        }
                         foreach (var client in clients)
                         {
                             if (client.Key.Equals(message.SenderEndPoint) || client.Value.Connection.Equals(null))
                                 continue;
-                            Debug.Log("informed client (" + client.Value.ID + ") that another client disconnected");
-                            response = server.CreateMessage();
-                            response.Write((byte) PacketTypes.DISCONNECTED); //0x01: Ein Client hat disconnected
-                            response.Write(clients[message.SenderEndPoint].ID);
-                            server.SendMessage(response, client.Value.Connection, NetDeliveryMethod.ReliableUnordered);
+                            PacketController.getInstance().SendClientDisconnect(clients[message.SenderEndPoint],
+                                client.Value.Connection);
                         }
                         clients.Remove(message.SenderEndPoint);
                         Debug.Log(message.SenderEndPoint + " disconnected!");
@@ -119,31 +113,14 @@ namespace Network
                         response.Write((short) clients.Count); //Anzahl aktueller Clients senden
                         server.SendMessage(response, message.SenderConnection, NetDeliveryMethod.ReliableUnordered);
 
-                        if (debugMode)
-                            Debug.Log("Sent 0x02 to " + newClient.ID);
-
                         foreach (var client in clients)
                         {
                             if (client.Key.Equals(message.SenderEndPoint)) continue;
 
                             //Tell all clients, a new client connected
-                            response = server.CreateMessage();
-                            response.Write((byte) PacketTypes.NEWCLIENT); //0x00: Neuer Client connected
-                            response.Write(newClient.ID); //Seine ID mitteilen
-                            response.Write(newClient.Position.x);
-                            response.Write(newClient.Position.y);
-                            response.Write(newClient.Position.z);
-
-                            response.Write(newClient.Rotation.x);
-                            response.Write(newClient.Rotation.y);
-                            response.Write(newClient.Rotation.z);
-                            server.SendMessage(response, client.Value.Connection, NetDeliveryMethod.ReliableUnordered);
+                            PacketController.getInstance().SendNewClientConnected(newClient, client.Value.Connection);
                         }
-
-                        if (debugMode)
-                            Debug.Log("Sent 0x00 to all");
-
-                        Debug.Log(message.SenderEndPoint + " connected!");
+                        Debug.Log("Created client with id '" + newClient.ID + "'!");
                     }
                     break;
                 default:
@@ -173,152 +150,84 @@ namespace Network
                     }
                     break;
 
-                //TODO RENAME TO GAMESTATE, since it now updates the gamestate?
-                case 0x1:
+                case 0x1: //gamestate
                     List<ClientData> _clients = (from client in clients
                         where client.Value.ID != clients[message.SenderEndPoint].ID
                         select client.Value).ToList();
                     foreach (ClientData client in _clients)
                     {
                         if (client.Connection == null) continue;
-
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.PLAYERLIST);
-                        response.Write(client.ID);
-                        response.Write(client.Position.x);
-                        response.Write(client.Position.y);
-                        response.Write(client.Position.z);
-
-                        response.Write(client.Rotation.x);
-                        response.Write(client.Rotation.y);
-                        response.Write(client.Rotation.z);
-
-                        response.Write(client.Team);
-
-                        server.SendMessage(response, clients[message.SenderEndPoint].Connection,
-                            NetDeliveryMethod.ReliableUnordered);
+                        PacketController.getInstance()
+                            .SendPlayerList(client, clients[message.SenderEndPoint].Connection);
                     }
 
                     foreach (var netObject in netObjs.Values)
-                    {
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.SPAWNPREFAB);
-                        response.Write(netObject.ID);
-                        response.Write(netObject.GetPrefabId);
-                        response.Write(netObject.Position.x);
-                        response.Write(netObject.Position.y);
-                        response.Write(netObject.Position.z);
+                        PacketController.getInstance().SendNetworkObjectSpawn(netObject);
 
-                        response.Write(netObject.Rotation.x);
-                        response.Write(netObject.Rotation.y);
-                        response.Write(netObject.Rotation.z);
-
-                        server.SendMessage(response, clients[message.SenderEndPoint].Connection,
-                            NetDeliveryMethod.ReliableUnordered);
-                    }
-
-                    if (debugMode)
-                        Debug.Log("Sent PLAYERLIST to " + clients[message.SenderEndPoint].ID);
+                    Debug.Log("Sent PLAYERLIST to " + clients[message.SenderEndPoint].ID);
                     break;
 
                 case 0x3: //statsUpdate
                     short defenderID = message.ReadInt16();
                     ClientData defender =
-                        (from client in clients where client.Value.ID == defenderID select client.Value)
-                        .ToList()[0];
+                        (from client in clients where client.Value.ID == defenderID select client.Value).ToList()[0];
+
                     ClientData attacker = clients[message.SenderEndPoint];
-                    UnityMainThreadDispatcher.Instance()
-                        .Enqueue(CalculatePlayerHitpoints(attacker, defender));
+                    HealthController.getInstance().CalculatePlayerHitpoints(attacker, defender);
 
                     foreach (ClientData client in clients.Values)
-                    {
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.DAMAGE);
-                        response.Write(defenderID);
-                        response.Write(defender.CurrentHitpoints);
-
-                        server.SendMessage(response, client.Connection, NetDeliveryMethod.ReliableOrdered);
-                    }
+                        PacketController.getInstance().SendPlayerHPUpdate(defender, client.Connection);
                     break;
 
                 case 0x4: //update animation
                     ClientData animPlayer = clients[message.SenderEndPoint];
                     animPlayer.AnimationState = (AnimationStates) message.ReadInt32();
+                    List<ClientData> _others = Utils.GetOtherClients(animPlayer, clients);
 
-                    List<ClientData> _others = (from client in clients
-                        where (client).Value.ID != clients[message.SenderEndPoint].ID
-                        select client.Value).ToList();
                     foreach (ClientData c in _others)
-                    {
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.ANIMATION);
-                        response.Write(animPlayer.ID);
-                        response.Write((int) animPlayer.AnimationState);
-                        server.SendMessage(response, c.Connection, NetDeliveryMethod.ReliableOrdered);
-                    }
+                        PacketController.getInstance().SendPlayerAnimationState(animPlayer, c.Connection);
                     break;
 
                 case 0x5: //chat event
-                    List<ClientData> recipents = (from client in clients
-                        where client.Value.ID != clients[message.SenderEndPoint].ID
-                        select client.Value).ToList();
-                    foreach (ClientData rec in recipents)
-                    {
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.TEXTMESSAGE);
-                        response.Write(clients[message.SenderEndPoint].ID);
-                        response.Write(message.ReadString());
-
-                        server.SendMessage(response, rec.Connection, NetDeliveryMethod.ReliableOrdered);
-                    }
+                    //TODO add chat controller and check message for different parameter
+                    //TODO add differenct chat channels
+                    //TODO make it possible to write a personal message to other players
+                    //TODO add commands
+                    foreach (ClientData rec in clients.Values)
+                        PacketController.getInstance()
+                            .SendChatMessage(clients[message.SenderEndPoint], rec.Connection, message.ReadString());
                     break;
 
                 case 0x6: //team join
-                    short selectorID = clients[message.SenderEndPoint].ID;
-                    clients[message.SenderEndPoint].Team = message.ReadInt32();
+                    int teamId = message.ReadInt32();
+                    if (TeamController.getInstance().AddToTeam(clients[message.SenderEndPoint], teamId))
+                    {
+                        PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], teamId);
+                        return;
+                    }
+                    PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], -1);
                     UnityMainThreadDispatcher.Instance()
                         .Enqueue(SpawnPlayer(clients[message.SenderEndPoint]));
-                    //TODO CHECK IF PLAYER CAN JOIN TEAM
-                    //TODO ADD TEAM SIZE (arraylist team1,team2)
-                    response = server.CreateMessage();
-                    response.Write((byte) PacketTypes.TEAMSELECT);
-                    response.Write(selectorID);
-                    response.Write(clients[message.SenderEndPoint].Team);
-                    server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
                     break;
 
                 case 0x7: //cutTree / farming
                     short interactEntityID = message.ReadInt16();
-
                     Vector3 targetPos = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
 
                     if (netObjs.ContainsKey(interactEntityID) &&
-                        CanInteract(clients[message.SenderEndPoint], targetPos))
+                        Utils.CanInteract(clients[message.SenderEndPoint], targetPos))
                     {
                         //TODO add multiple ressources and dont return on another prefab as tree
+                        //TODO get a list of interactable types / mineable types
+                        //TODO add a interact function to every type of entity and call the function of the networkobject
                         if (netObjs[interactEntityID].prefabType != PrefabTypes.TREE) return;
 
-                        Vector3 dropLocation =
-                            CalculateDropLocation(netObjs[interactEntityID].Position, (int) GameConstants.dropRange);
-                        short ID = GetFreeID();
+                        Vector3 dropLocation = Utils.CalculateDropLocation(netObjs[interactEntityID].Position,
+                            (int) GameConstants.dropRange);
                         UnityMainThreadDispatcher.Instance()
                             .Enqueue(DestroyNetObject(netObjs[interactEntityID]));
                         UnityMainThreadDispatcher.Instance()
-                            .Enqueue(DropItem(PrefabTypes.TREE, dropLocation));
-
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.SPAWNPREFAB);
-                        response.Write(ID);
-                        response.Write((int) PrefabTypes.WOOD);
-                        response.Write(dropLocation.x);
-                        response.Write(dropLocation.y);
-                        response.Write(dropLocation.z);
-
-                        response.Write(Vector3.zero.z);
-                        response.Write(Vector3.zero.z);
-                        response.Write(Vector3.zero.z);
-
-                        server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+                            .Enqueue(SpawnPrefab(PrefabTypes.WOOD, dropLocation));
                     }
                     break;
                 case 0x8: //addItemRequest / pickup Item
@@ -327,7 +236,7 @@ namespace Network
                     short netId = message.ReadInt16();
 
                     if (netObjs.ContainsKey(netId) &&
-                        CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
+                        Utils.CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
                     {
                         UnityMainThreadDispatcher.Instance()
                             .Enqueue(DestroyNetObject(netObjs[netId].gameObject));

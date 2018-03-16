@@ -1,41 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using Lidgren.Network;
 using UnityEngine;
-using Utility;
-using Random = System.Random;
 
 namespace Network
 {
-    public enum PacketTypes
-    {
-        //BASIC TYPES
-        CONNECTED = 0,
-        DISCONNECTED = 1,
-        PLAYERLIST = 2,
-        NEWCLIENT = 3,
-        MOVE = 4,
-        DAMAGE = 5,
-        ANIMATION = 6,
-        TEXTMESSAGE = 7,
-        SPAWNPREFAB = 8,
-        UPDATEPREFAB = 9,
-        DESTROYPREFAB = 10,
-        TEAMSELECT = 11,
-        RESPAWN = 12,
-        WEAPONCHANGE = 13,
-
-        //Worldevents
-        DROP = 14,
-        PICKUP = 15,
-
-        //INTERACTIONS
-        TREECUTTING = 16
-    }
-
     internal partial class Server
     {
         private NetPeerConfiguration config;
@@ -43,7 +14,7 @@ namespace Network
 
         public Dictionary<IPEndPoint, ClientData> clients;
         public Dictionary<short, Transform> clientsTransform;
-        public static Dictionary<int, NetworkObject> netObjs = new Dictionary<int, NetworkObject>();
+        public Dictionary<int, NetworkObject> netObjs = new Dictionary<int, NetworkObject>();
         private int objectCount;
 
         private Thread serverThread;
@@ -58,9 +29,24 @@ namespace Network
         public Transform redBase;
         public Transform blueBase;
 
-        private PrefabManager _prefabManager;
-
+        private static Server instance;
         public float serverTime;
+
+        public static Server getInstance()
+        {
+            return instance;
+        }
+
+        private void Awake()
+        {
+            //Check if instance already exists
+            if (instance == null)
+                instance = this;
+            else if (instance != this)
+                Destroy(gameObject);
+
+            DontDestroyOnLoad(gameObject);
+        }
 
         private void Start()
         {
@@ -84,11 +70,9 @@ namespace Network
             }
             catch (Exception ex)
             {
-                Debug.Log("Error during startup: " + ex.Message);
+                Debug.LogError("Error during startup: " + ex.Message);
                 DeadLine();
             }
-
-            _prefabManager = GameObject.Find("PrefabManager").GetComponent<PrefabManager>();
 
             if (ConnectoDB())
             {
@@ -102,12 +86,12 @@ namespace Network
                 return;
             }
             if (!isStarted)
-                Debug.Log("Error while starting the server");
+                Debug.LogError("Error while starting the server");
         }
 
         private static bool ConnectoDB()
         {
-            //TODO
+            //TODO add database and try to connect to it, cancel if it fails
             return true;
         }
 
@@ -127,37 +111,6 @@ namespace Network
             //gameThread.Join();
             server.Shutdown("Server shutdown.");
             Debug.Log("Server shutdown complete!");
-        }
-
-        public static short GetFreeID()
-        {
-            List<int> usedIds = (from netOBJ in netObjs select netOBJ.Key).ToList();
-            if (usedIds.Count == 0) return 0;
-
-            for (short id = 0; id <= usedIds.Count; id++)
-                if (!usedIds.Contains(id))
-                    return id;
-
-            return -1;
-        }
-
-        //HELPER / UTLITY
-        public static Vector3 CalculateDropLocation(Vector3 netObjLoc, int range)
-        {
-            Random ran = new Random();
-            float x = netObjLoc.x + ran.Next(-range, range);
-            float y = netObjLoc.y - 0.2f;
-            float z = netObjLoc.z + ran.Next(-range, range);
-            Debug.Log("X: " + x + "Y: " + y + "Z: " + z);
-            return new Vector3(x, y, z);
-        }
-
-        //TODO check for interact range (Vector3 target, float range) -> problem with unity multithreading
-        private static bool CanInteract(ClientData client, Vector3 targetPos)
-        {
-            if (client.IsDead) return false;
-
-            return !(Vector3.Distance(client.Position, targetPos) > GameConstants.interactRange);
         }
     }
 }

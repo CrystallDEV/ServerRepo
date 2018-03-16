@@ -1,4 +1,4 @@
-﻿using Lidgren.Network;
+﻿using Network.Packets;
 using UnityEngine;
 using Utility;
 
@@ -15,36 +15,17 @@ namespace Network
         public Vector3 Rotation { get; protected set; }
         public bool isMoveable;
 
-        private Network.Server server;
-
-        private void Awake()
-        {
-            server = GameObject.Find("Server").GetComponent<Network.Server>();
-        }
 
         private void Start()
         {
-            ID = Network.Server.GetFreeID();
+            ID = Utils.GetFreeID();
             Debug.Log("PrefabID: " + ID);
-            Network.Server.netObjs.Add(ID, this);
+            Server.getInstance().netObjs.Add(ID, this);
             Position = transform.position;
             Rotation = transform.rotation.eulerAngles;
 
-            if (!server.isStarted) return;
-
-            var response = server.server.CreateMessage();
-            response.Write((byte) PacketTypes.SPAWNPREFAB);
-            response.Write(ID);
-            response.Write(GetPrefabId);
-            response.Write(Position.x);
-            response.Write(Position.y);
-            response.Write(Position.z);
-
-            response.Write(Rotation.x);
-            response.Write(Rotation.y);
-            response.Write(Rotation.z);
-
-            server.server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+            if (!Server.getInstance().isStarted) return;
+            PacketController.getInstance().SendNetworkObjectSpawn(this);
         }
 
 
@@ -60,26 +41,13 @@ namespace Network
             LastPosition = transform.position;
             Position = transform.position;
 
-            NetOutgoingMessage response = server.server.CreateMessage();
-            response.Write((byte) PacketTypes.UPDATEPREFAB);
-            response.Write(ID);
-            response.Write(transform.position.x);
-            response.Write(transform.position.y);
-            response.Write(transform.position.z);
-
-            response.Write(transform.rotation.x);
-            response.Write(transform.rotation.y);
-            response.Write(transform.rotation.z);
-            server.server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
+            PacketController.getInstance().SendNetworkObjectPosition(this);
         }
 
         private void OnDestroy()
         {
-            Network.Server.netObjs.Remove(ID);
-            var response = server.server.CreateMessage();
-            response.Write((byte) PacketTypes.DESTROYPREFAB);
-            response.Write(ID);
-            server.server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().netObjs.Remove(ID);
+            PacketController.getInstance().SendNetworkObjectDestroy(this);
         }
 
         public int GetPrefabId
