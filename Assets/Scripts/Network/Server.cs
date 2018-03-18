@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Network
 {
-    internal partial class Server
+    internal partial class Server : MonoBehaviour
     {
         private NetPeerConfiguration config;
         public NetServer server;
@@ -26,9 +26,6 @@ namespace Network
         //TODO move somewhere else
         public Transform playerPrefab;
 
-        public Transform redBase;
-        public Transform blueBase;
-
         private static Server instance;
         public float serverTime;
 
@@ -37,6 +34,7 @@ namespace Network
             return instance;
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private void Awake()
         {
             //Check if instance already exists
@@ -48,6 +46,7 @@ namespace Network
             DontDestroyOnLoad(gameObject);
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private void Start()
         {
             Debug.Log("Setting up server ...");
@@ -64,7 +63,7 @@ namespace Network
 
                 //config.SimulatedRandomLatency = 0.6f;
                 //config.SimulatedLoss = 0.05f;
-
+                UnityThread.initUnityThread();
                 server = new NetServer(config);
                 server.Start();
             }
@@ -95,22 +94,21 @@ namespace Network
             return true;
         }
 
-
-        private void Update()
+        private void DeadLine()
         {
-            if (!isStarted) return;
-            CalculatePlayerMovement();
-            CalculatePlayerDeathTime();
+            if (isStarted)
+            {
+                serverThread.Join();
+                isStarted = false;
+                server.Shutdown("Server shutdown.");
+                Debug.Log("Server shutdown complete!");
+            }
         }
 
-        public void DeadLine()
+        private void OnDisable()
         {
-            serverThread.Abort();
-            serverThread.Join();
-            //gameThread.Abort();
-            //gameThread.Join();
-            server.Shutdown("Server shutdown.");
-            Debug.Log("Server shutdown complete!");
+            if (serverThread.IsAlive)
+                DeadLine();
         }
     }
 }

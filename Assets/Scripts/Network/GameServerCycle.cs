@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Linq;
-using Network.Health;
+﻿using Network.Health;
 using Network.Movement;
 using Network.Packets;
 using Network.Prefabs;
@@ -9,20 +7,47 @@ using Utility;
 
 namespace Network
 {
-    internal partial class Server : MonoBehaviour
+    public class GameServerCycle : MonoBehaviour
     {
-        private void CalculatePlayerMovement()
+        private static GameServerCycle instance;
+
+        public GameObject playerPrefab;
+
+        public static GameServerCycle getInstance()
         {
-            foreach (ClientData _client in clients.Values.ToList())
+            return instance;
+        }
+
+        private void Awake()
+        {
+            //Check if instance already exists
+            if (instance == null)
+                instance = this;
+            else if (instance != this)
+                Destroy(gameObject);
+
+            DontDestroyOnLoad(gameObject);
+        }
+
+        private void Update()
+        {
+            if (!Server.getInstance().isStarted) return;
+            CalculatePlayerMovement();
+            CalculatePlayerDeathTime();
+        }
+
+        public void CalculatePlayerMovement()
+        {
+            foreach (ClientData _client in Server.getInstance().clients.Values)
             {
-                if (_client == null || !clientsTransform.ContainsKey(_client.ID)) continue;
+                if (_client == null || !Server.getInstance().clientsTransform.ContainsKey(_client.ID)) continue;
                 MovementController.getInstance().UpdatePlayerPosition(_client);
             }
         }
 
-        private void CalculatePlayerDeathTime()
+        public void CalculatePlayerDeathTime()
         {
-            foreach (ClientData _client in clients.Values.ToList())
+            foreach (ClientData _client in Server.getInstance().clients.Values)
             {
                 if (_client == null || !_client.IsDead) continue;
 
@@ -32,62 +57,56 @@ namespace Network
                 }
                 else
                 {
-                    clients[_client.Connection.RemoteEndPoint] = new ClientData(_client.Connection, _client.ID);
-                    StartCoroutine(SpawnPlayer(_client));
+                    Server.getInstance().clients[_client.Connection.RemoteEndPoint] =
+                        new ClientData(_client.Connection, _client.ID);
+                    SpawnPlayer(_client);
                     PacketController.getInstance().SendPlayerRespawn(_client);
                 }
             }
         }
 
-        private IEnumerator SpawnPrefab(PrefabTypes type, Vector3 dropLocation)
+        public void SpawnPrefab(PrefabTypes type, Vector3 dropLocation)
         {
             PrefabController.getInstance().SpawnPrefab(type, dropLocation, Quaternion.Euler(Vector3.zero));
-            yield return null;
         }
 
 
-        private IEnumerator KillPlayer(ClientData _client)
+        public void KillPlayer(ClientData _client)
         {
             HealthController.getInstance().KillPlayer(_client);
-            yield return null;
         }
 
 
-        private IEnumerator SpawnPlayer(ClientData _client)
+        public void SpawnPlayer(ClientData _client)
         {
-            //TODO spawn player at team spawn location (new field)
             //TODO get player by new function GetTeamFromPlayer(Team team) / GetTeamFromPlayer(int id)
-            if (!_client.HasTeam()) yield break;
-            Transform player = Instantiate(playerPrefab);
+            if (!_client.HasTeam()) return;
+            GameObject player = Instantiate(playerPrefab);
             player.name = _client.ID.ToString();
-            clientsTransform.Add(_client.ID, player);
+            Server.getInstance().clientsTransform.Add(_client.ID, player.transform);
 
-            player.position = _client.Team.spawn;
-            yield return null;
+            player.transform.position = _client.Team.spawn;
         }
 
-        private IEnumerator DestroyNetObject(Transform toDestroy)
+        public void DestroyNetObject(Transform toDestroy)
         {
             Destroy(toDestroy.gameObject);
-            yield return null;
         }
 
-        private IEnumerator DestroyNetObject(GameObject toDestroy)
+        public void DestroyNetObject(GameObject toDestroy)
         {
             Destroy(toDestroy);
-            yield return null;
         }
 
-        private IEnumerator DestroyNetObject(NetworkObject toDestroy)
+        public void DestroyNetObject(NetworkObject toDestroy)
         {
             Destroy(toDestroy.gameObject);
-            yield return null;
         }
 
 
-        private void CutTree(ClientData client, NetworkObject netObj)
+        public void CutTree(ClientData client, NetworkObject netObj)
         {
-            //TODO
+            //TODO   
         }
     }
 }

@@ -50,10 +50,10 @@ namespace Network.Packets
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DISCONNECTED); //0x01: Ein Client hat disconnected
             response.Write(_client.ID);
-            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
-        public void SendNewClientConnected(ClientData _client, NetConnection receiver)
+        public void SendNewClientConnected(ClientData _client)
         {
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.NEW_CLIENT_CONNECTED);
@@ -65,7 +65,7 @@ namespace Network.Packets
             response.Write(_client.Rotation.x);
             response.Write(_client.Rotation.y);
             response.Write(_client.Rotation.z);
-            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().server.SendToAll(response, _client.Connection, NetDeliveryMethod.ReliableOrdered, 1);
         }
 
         public void SendChatMessage(ClientData _client, NetConnection receiver, string message)
@@ -132,7 +132,7 @@ namespace Network.Packets
             response.Write(_client.Rotation.x);
             response.Write(_client.Rotation.y);
             response.Write(_client.Rotation.z);
-            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
         public void SendPlayerList(ClientData _client, NetConnection receiver)
@@ -151,7 +151,7 @@ namespace Network.Packets
             response.Write(_client.Rotation.z);
 
             response.Write(_client.Team.id);
-            server.server.SendMessage(response, receiver, NetDeliveryMethod.ReliableUnordered);
+            server.server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
         #region networkObject
@@ -169,7 +169,7 @@ namespace Network.Packets
             response.Write(obj.Rotation.x);
             response.Write(obj.Rotation.y);
             response.Write(obj.Rotation.z);
-            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
         public void SendNetworkObjectPosition(NetworkObject obj)
@@ -192,7 +192,7 @@ namespace Network.Packets
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DESTROY_NETWORK_OBJECT);
             response.Write(obj.ID);
-            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
     }
 

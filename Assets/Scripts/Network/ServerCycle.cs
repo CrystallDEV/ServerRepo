@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Lidgren.Network;
@@ -18,7 +17,7 @@ namespace Network
     {
         public void WorkMessages()
         {
-            while (serverThread.ThreadState != ThreadState.AbortRequested)
+            while (serverThread.ThreadState != ThreadState.AbortRequested && serverThread.IsAlive)
             {
                 ReadMessages();
             }
@@ -67,27 +66,19 @@ namespace Network
                     NetConnectionStatus state = (NetConnectionStatus) message.ReadByte();
                     if (state == NetConnectionStatus.Disconnected || state == NetConnectionStatus.Disconnecting)
                     {
-                        //TODO SendPlayerDisconnect
-                        //player leaves the server
                         if (!clients.ContainsKey(message.SenderEndPoint))
                             break;
                         ClientData disconnectClientData = clients[message.SenderEndPoint];
-                        Debug.Log(
-                            "Player disconnected: " + disconnectClientData.UserName + "(" + disconnectClientData.ID +
-                            ")"
-                        );
-                        try
+                        Debug.Log("Player disconnected: " + disconnectClientData.UserName + "(" +
+                                  disconnectClientData.ID + ")");
+                        if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
                         {
-                            if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
+                            UnityThread.executeInLateUpdate(() =>
                             {
-                                UnityMainThreadDispatcher.Instance()
-                                    .Enqueue(DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]));
-                                clientsTransform.Remove(clients[message.SenderEndPoint].ID);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.LogError(ex.StackTrace);
+                                GameServerCycle.getInstance()
+                                    .DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]);
+                            });
+                            clientsTransform.Remove(clients[message.SenderEndPoint].ID);
                         }
                         foreach (var client in clients)
                         {
@@ -101,11 +92,10 @@ namespace Network
                     }
                     else if (state == NetConnectionStatus.Connected)
                     {
-                        //new players connects to the server
+                        //new player connects to the server
                         if (clients.ContainsKey(message.SenderEndPoint)) break;
                         ClientData newClient = new ClientData(message.SenderConnection, ClientData.GetFreeID(clients));
                         clients.Add(message.SenderEndPoint, newClient);
-                        Debug.Log("Created client with id '" + newClient.ID + "'!");
 
                         response = server.CreateMessage();
                         response.Write((byte) PacketTypes.CONNECTED);
@@ -113,12 +103,12 @@ namespace Network
                         response.Write((short) clients.Count); //Anzahl aktueller Clients senden
                         server.SendMessage(response, message.SenderConnection, NetDeliveryMethod.ReliableUnordered);
 
-                        foreach (var client in clients)
+                        foreach (var client in clients.Values)
                         {
-                            if (client.Key.Equals(message.SenderEndPoint)) continue;
+                            if (client.Equals(newClient)) continue;
 
                             //Tell all clients, a new client connected
-                            PacketController.getInstance().SendNewClientConnected(newClient, client.Value.Connection);
+                            PacketController.getInstance().SendNewClientConnected(newClient);
                         }
                         Debug.Log("Created client with id '" + newClient.ID + "'!");
                     }
@@ -203,11 +193,16 @@ namespace Network
                     if (TeamController.getInstance().AddToTeam(clients[message.SenderEndPoint], teamId))
                     {
                         PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], teamId);
+
+                        UnityThread.executeInLateUpdate(() =>
+                        {
+                            GameServerCycle.getInstance()
+                                .SpawnPlayer(clients[message.SenderEndPoint]);
+                        });
                         return;
                     }
                     PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], -1);
-                    UnityMainThreadDispatcher.Instance()
-                        .Enqueue(SpawnPlayer(clients[message.SenderEndPoint]));
+
                     break;
 
                 case 0x7: //cutTree / farming
@@ -224,11 +219,17 @@ namespace Network
 
                         Vector3 dropLocation = Utils.CalculateDropLocation(netObjs[interactEntityID].Position,
                             (int) GameConstants.dropRange);
-                        UnityMainThreadDispatcher.Instance()
-                            .Enqueue(DestroyNetObject(netObjs[interactEntityID]));
-                        UnityMainThreadDispatcher.Instance()
-                            .Enqueue(SpawnPrefab(PrefabTypes.WOOD, dropLocation));
+
+                        UnityThread.executeInLateUpdate(() =>
+                        {
+                            GameServerCycle.getInstance()
+                                .DestroyNetObject(netObjs[interactEntityID]);
+
+                            GameServerCycle.getInstance()
+                                .SpawnPrefab(PrefabTypes.WOOD, dropLocation);
+                        });
                     }
+
                     break;
                 case 0x8: //addItemRequest / pickup Item
                     //TODO add picker 
@@ -238,9 +239,11 @@ namespace Network
                     if (netObjs.ContainsKey(netId) &&
                         Utils.CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
                     {
-                        UnityMainThreadDispatcher.Instance()
-                            .Enqueue(DestroyNetObject(netObjs[netId].gameObject));
-
+                        UnityThread.executeInLateUpdate(() =>
+                        {
+                            GameServerCycle.getInstance()
+                                .DestroyNetObject(netObjs[netId].gameObject);
+                        });
                         response = server.CreateMessage();
                         response.Write((byte) PacketTypes.PICKUP);
                         response.Write(netId);
