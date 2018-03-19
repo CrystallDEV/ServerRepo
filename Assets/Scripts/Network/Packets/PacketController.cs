@@ -47,6 +47,9 @@ namespace Network.Packets
 
         public void SendClientDisconnect(ClientData _client, NetConnection receiver)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Player disconnected: " + _client.UserName + "(" + _client.ID + ")");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DISCONNECTED); //0x01: Ein Client hat disconnected
             response.Write(_client.ID);
@@ -55,6 +58,9 @@ namespace Network.Packets
 
         public void SendNewClientConnected(ClientData _client)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Player connected");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.NEW_CLIENT_CONNECTED);
             response.Write(_client.ID); //Seine ID mitteilen
@@ -70,6 +76,9 @@ namespace Network.Packets
 
         public void SendChatMessage(ClientData _client, NetConnection receiver, string message)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Text message sent");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.TEXT_MESSAGE);
             response.Write(_client.ID);
@@ -79,6 +88,9 @@ namespace Network.Packets
 
         public void SendPlayerHPUpdate(ClientData _client, NetConnection receiver)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Damage message");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DAMAGE);
             response.Write(_client.ID);
@@ -86,17 +98,28 @@ namespace Network.Packets
             Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
-        public void SendPlayerTeamJoin(ClientData _client, int team)
+        public void SendPlayerTeamJoin(ClientData _client, NetConnection receiver)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Team select message");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.TEAMSELECT);
             response.Write(_client.ID);
-            response.Write(_client.Team.id);
-            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
+
+            if (!_client.HasTeam())
+                response.Write(-1);
+            else
+                response.Write(_client.Team.id);
+
+            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
         public void SendPlayerPosition(ClientData _client)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Move message");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.MOVE);
             response.Write(_client.ID);
@@ -108,11 +131,14 @@ namespace Network.Packets
             response.Write(_client.Rotation.y);
             response.Write(_client.Rotation.z);
             response.Write(_client.moveTime);
-            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
         public void SendPlayerAnimationState(ClientData _client, NetConnection receiver)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Animation message sent");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.ANIMATION);
             response.Write(_client.ID);
@@ -122,6 +148,9 @@ namespace Network.Packets
 
         public void SendPlayerRespawn(ClientData _client)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Player respawn message");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.RESPAWN_PLAYER);
             response.Write(_client.ID);
@@ -137,6 +166,9 @@ namespace Network.Packets
 
         public void SendPlayerList(ClientData _client, NetConnection receiver)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Player list message");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             Server server = Server.getInstance();
 
@@ -150,14 +182,49 @@ namespace Network.Packets
             response.Write(_client.Rotation.y);
             response.Write(_client.Rotation.z);
 
-            response.Write(_client.Team.id);
+            if (_client.HasTeam())
+                response.Write(_client.Team.id);
+            else
+                response.Write(-1);
+
             server.server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
         #region networkObject
 
+        /// <summary>
+        /// sends a network spawn message to the given client
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="receiver"></param>
+        public void SendNetworkObjectSpawn(NetworkObject obj, NetConnection receiver)
+        {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Spawn network message");
+
+            var response = Server.getInstance().server.CreateMessage();
+            response.Write((byte) PacketTypes.SPAWN_NETWORK_OBJECT);
+            response.Write(obj.ID);
+            response.Write(obj.GetPrefabId);
+            response.Write(obj.Position.x);
+            response.Write(obj.Position.y);
+            response.Write(obj.Position.z);
+
+            response.Write(obj.Rotation.x);
+            response.Write(obj.Rotation.y);
+            response.Write(obj.Rotation.z);
+            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        /// <summary>
+        /// Sends a network spawn message to all clients
+        /// </summary>
+        /// <param name="obj"></param>
         public void SendNetworkObjectSpawn(NetworkObject obj)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Spawn network message");
+
             var response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.SPAWN_NETWORK_OBJECT);
             response.Write(obj.ID);
@@ -174,6 +241,9 @@ namespace Network.Packets
 
         public void SendNetworkObjectPosition(NetworkObject obj)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Update network object");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.UPDATE_NETWORK_OBJECT);
             response.Write(obj.ID);
@@ -189,6 +259,9 @@ namespace Network.Packets
 
         public void SendNetworkObjectDestroy(NetworkObject obj)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Destroy network object");
+
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DESTROY_NETWORK_OBJECT);
             response.Write(obj.ID);

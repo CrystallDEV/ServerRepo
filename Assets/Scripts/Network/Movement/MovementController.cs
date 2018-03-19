@@ -79,6 +79,7 @@ namespace Network.Movement
             {
                 _client.moveTime++;
             }
+
             _client.LastPosition = _client.Position;
             PacketController.getInstance().SendPlayerPosition(_client);
         }

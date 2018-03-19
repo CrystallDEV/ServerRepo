@@ -15,14 +15,6 @@ namespace Network
 {
     internal partial class Server
     {
-        public void WorkMessages()
-        {
-            while (serverThread.ThreadState != ThreadState.AbortRequested && serverThread.IsAlive)
-            {
-                ReadMessages();
-            }
-        }
-
         private void ReadMessages()
         {
             NetIncomingMessage message;
@@ -52,6 +44,7 @@ namespace Network
 
                         Debug.Log(message.SenderEndPoint + " has discovered the server!");
                     }
+
                     break;
                 case NetIncomingMessageType.ConnectionApproval:
                     //Accept new clients that are trying to connect
@@ -68,18 +61,14 @@ namespace Network
                     {
                         if (!clients.ContainsKey(message.SenderEndPoint))
                             break;
-                        ClientData disconnectClientData = clients[message.SenderEndPoint];
-                        Debug.Log("Player disconnected: " + disconnectClientData.UserName + "(" +
-                                  disconnectClientData.ID + ")");
-                        if (clientsTransform[clients[message.SenderEndPoint].ID] != null)
+                        if (clientsTransform.ContainsKey(clients[message.SenderEndPoint].ID))
                         {
-                            UnityThread.executeInLateUpdate(() =>
-                            {
-                                GameServerCycle.getInstance()
-                                    .DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]);
-                            });
+                            GameServerCycle.getInstance()
+                                .DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]);
                             clientsTransform.Remove(clients[message.SenderEndPoint].ID);
                         }
+
+
                         foreach (var client in clients)
                         {
                             if (client.Key.Equals(message.SenderEndPoint) || client.Value.Connection.Equals(null))
@@ -87,8 +76,8 @@ namespace Network
                             PacketController.getInstance().SendClientDisconnect(clients[message.SenderEndPoint],
                                 client.Value.Connection);
                         }
+
                         clients.Remove(message.SenderEndPoint);
-                        Debug.Log(message.SenderEndPoint + " disconnected!");
                     }
                     else if (state == NetConnectionStatus.Connected)
                     {
@@ -110,8 +99,10 @@ namespace Network
                             //Tell all clients, a new client connected
                             PacketController.getInstance().SendNewClientConnected(newClient);
                         }
+
                         Debug.Log("Created client with id '" + newClient.ID + "'!");
                     }
+
                     break;
                 default:
                     Debug.Log("Unhandled Messagetype: " + message.MessageType);
@@ -132,12 +123,13 @@ namespace Network
                     if (_client.WantsPredict)
                     {
                         float movetime = message.ReadFloat();
-                        if (movetime != _client.moveTime)
+                        if (movetime <= _client.moveTime)
                         {
                             Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " +
                                       _client.moveTime);
                         }
                     }
+
                     break;
 
                 case 0x1: //gamestate
@@ -152,15 +144,18 @@ namespace Network
                     }
 
                     foreach (var netObject in netObjs.Values)
-                        PacketController.getInstance().SendNetworkObjectSpawn(netObject);
+                    {
+                        PacketController.getInstance()
+                            .SendNetworkObjectSpawn(netObject, clients[message.SenderEndPoint].Connection);
+                    }
 
                     Debug.Log("Sent PLAYERLIST to " + clients[message.SenderEndPoint].ID);
                     break;
 
                 case 0x3: //statsUpdate
-                    short defenderID = message.ReadInt16();
+                    short defenderId = message.ReadInt16();
                     ClientData defender =
-                        (from client in clients where client.Value.ID == defenderID select client.Value).ToList()[0];
+                        (from client in clients where client.Value.ID == defenderId select client.Value).ToList()[0];
 
                     ClientData attacker = clients[message.SenderEndPoint];
                     HealthController.getInstance().CalculatePlayerHitpoints(attacker, defender);
@@ -188,20 +183,17 @@ namespace Network
                             .SendChatMessage(clients[message.SenderEndPoint], rec.Connection, message.ReadString());
                     break;
 
-                case 0x6: //team join
+                case 0x6: //team join+
+                    Debug.Log("Received team join request");
                     int teamId = message.ReadInt32();
                     if (TeamController.getInstance().AddToTeam(clients[message.SenderEndPoint], teamId))
+                        GameServerCycle.getInstance()
+                            .SpawnPlayer(clients[message.SenderEndPoint]);
+                    foreach (var receiver in clients.Values)
                     {
-                        PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], teamId);
-
-                        UnityThread.executeInLateUpdate(() =>
-                        {
-                            GameServerCycle.getInstance()
-                                .SpawnPlayer(clients[message.SenderEndPoint]);
-                        });
-                        return;
+                        PacketController.getInstance()
+                            .SendPlayerTeamJoin(clients[message.SenderEndPoint], receiver.Connection);
                     }
-                    PacketController.getInstance().SendPlayerTeamJoin(clients[message.SenderEndPoint], -1);
 
                     break;
 
@@ -220,14 +212,11 @@ namespace Network
                         Vector3 dropLocation = Utils.CalculateDropLocation(netObjs[interactEntityID].Position,
                             (int) GameConstants.dropRange);
 
-                        UnityThread.executeInLateUpdate(() =>
-                        {
-                            GameServerCycle.getInstance()
-                                .DestroyNetObject(netObjs[interactEntityID]);
+                        GameServerCycle.getInstance()
+                            .DestroyNetObject(netObjs[interactEntityID]);
 
-                            GameServerCycle.getInstance()
-                                .SpawnPrefab(PrefabTypes.WOOD, dropLocation);
-                        });
+                        GameServerCycle.getInstance()
+                            .SpawnPrefab(PrefabTypes.WOOD, dropLocation);
                     }
 
                     break;
@@ -239,17 +228,15 @@ namespace Network
                     if (netObjs.ContainsKey(netId) &&
                         Utils.CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
                     {
-                        UnityThread.executeInLateUpdate(() =>
-                        {
-                            GameServerCycle.getInstance()
-                                .DestroyNetObject(netObjs[netId].gameObject);
-                        });
+                        GameServerCycle.getInstance()
+                            .DestroyNetObject(netObjs[netId].gameObject);
                         response = server.CreateMessage();
                         response.Write((byte) PacketTypes.PICKUP);
                         response.Write(netId);
                         server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                         //TODO check add inventory attribute to the clientdata
                     }
+
                     break;
 
                 case 0x9: //weapon change event

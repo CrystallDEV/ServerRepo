@@ -60,10 +60,11 @@ namespace Network
                 config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
                 config.Port = 57798;
                 config.UseMessageRecycling = true;
+                config.AutoFlushSendQueue = true;
 
                 //config.SimulatedRandomLatency = 0.6f;
                 //config.SimulatedLoss = 0.05f;
-                UnityThread.initUnityThread();
+//                UnityThread.initUnityThread();
                 server = new NetServer(config);
                 server.Start();
             }
@@ -75,8 +76,8 @@ namespace Network
 
             if (ConnectoDB())
             {
-                serverThread = new Thread(WorkMessages);
-                serverThread.Start();
+//                serverThread = new Thread(WorkMessages);
+//                serverThread.Start();
 
                 //gameThread = new Thread(WorkGameData);
                 //gameThread.Start();
@@ -84,6 +85,7 @@ namespace Network
                 Debug.Log("Server started successfully");
                 return;
             }
+
             if (!isStarted)
                 Debug.LogError("Error while starting the server");
         }
@@ -94,11 +96,17 @@ namespace Network
             return true;
         }
 
+        private void Update()
+        {
+            ReadMessages();
+        }
+
         private void DeadLine()
         {
             if (isStarted)
             {
-                serverThread.Join();
+//                serverThread.Abort();
+//                serverThread.Join();
                 isStarted = false;
                 server.Shutdown("Server shutdown.");
                 Debug.Log("Server shutdown complete!");
@@ -107,8 +115,7 @@ namespace Network
 
         private void OnDisable()
         {
-            if (serverThread.IsAlive)
-                DeadLine();
+            DeadLine();
         }
     }
 }

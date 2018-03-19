@@ -39,17 +39,18 @@ namespace Network.Teams
                 _client.Team = team;
                 return true;
             }
+
             return false;
         }
 
-        public bool RemoveFromTeam(ClientData _client, Team team)
+        public bool RemoveFromTeam(ClientData _client)
         {
-            return team.RemovePlayer(_client);
+            return _client.Team.RemovePlayer(_client);
         }
 
         public Team GetTeamById(int id)
         {
-            return teams[id];
+            return teams[id - 1];
         }
     }
 }
