@@ -41,20 +41,20 @@ namespace Network.Prefabs
         {
             return prefabs[id];
         }
-        
+
         public GameObject getPrefabByType(PrefabTypes type)
         {
             return prefabs[(int) type];
         }
-        
-        public void SpawnPrefab(PrefabTypes type, Vector3 pos, Quaternion rot)
+
+        public void SpawnPrefab(PrefabTypes type, Vector3 pos, Quaternion rot = default(Quaternion))
         {
             GameObject prefab = Instantiate(getPrefabByType(type));
             prefab.transform.position = pos;
             prefab.transform.rotation = rot;
         }
 
-        public void SpawnPrefab(int prefabID, Vector3 pos, Quaternion rot)
+        public void SpawnPrefab(int prefabID, Vector3 pos, Quaternion rot = default(Quaternion))
         {
             GameObject prefab = Instantiate(getPrefabById(prefabID));
             prefab.transform.position = pos;

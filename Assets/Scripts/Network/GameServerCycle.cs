@@ -1,9 +1,6 @@
-﻿using Network.Health;
-using Network.Movement;
+﻿using Network.Movement;
 using Network.Packets;
-using Network.Prefabs;
 using UnityEngine;
-using Utility;
 
 namespace Network
 {
@@ -65,26 +62,12 @@ namespace Network
             }
         }
 
-        public void SpawnPrefab(PrefabTypes type, Vector3 dropLocation)
-        {
-            PrefabController.getInstance().SpawnPrefab(type, dropLocation, Quaternion.Euler(Vector3.zero));
-        }
-
-
-        public void KillPlayer(ClientData _client)
-        {
-            HealthController.getInstance().KillPlayer(_client);
-        }
-
-
         public void SpawnPlayer(ClientData _client)
         {
-            //TODO get player by new function GetTeamFromPlayer(Team team) / GetTeamFromPlayer(int id)
             if (!_client.HasTeam()) return;
             GameObject player = Instantiate(playerPrefab);
             player.name = _client.ID.ToString();
             Server.getInstance().clientsTransform.Add(_client.ID, player.transform);
-
             player.transform.position = _client.Team.spawn;
         }
 
@@ -101,12 +84,6 @@ namespace Network
         public void DestroyNetObject(NetworkObject toDestroy)
         {
             Destroy(toDestroy.gameObject);
-        }
-
-
-        public void CutTree(ClientData client, NetworkObject netObj)
-        {
-            //TODO   
         }
     }
 }

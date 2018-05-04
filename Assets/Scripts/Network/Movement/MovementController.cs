@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using Network.Packets;
 using UnityEngine;
 
@@ -25,11 +24,11 @@ namespace Network.Movement
             DontDestroyOnLoad(gameObject);
         }
 
-        public IEnumerator Jump(ClientData _client)
+        public void Jump(ClientData _client)
         {
-            //Transform player = clientsTransform[_client.ID];
-            //TODO Jump
-            yield return null;
+            Transform player = Server.getInstance().clientsTransform[_client.ID];
+            Vector3 vel = player.GetComponent<Rigidbody>().velocity;
+            player.GetComponent<Rigidbody>().velocity = new Vector3(vel.x, 100, vel.z);
         }
 
         public void UpdatePlayerPosition(ClientData _client)

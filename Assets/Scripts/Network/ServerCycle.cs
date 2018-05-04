@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Lidgren.Network;
 using Network.Animation;
 using Network.Health;
 using Network.Movement;
 using Network.Packets;
+using Network.Prefabs;
 using Network.Teams;
-using Network.Weapons;
 using UnityEngine;
 using Utility;
 
@@ -18,7 +17,6 @@ namespace Network
         private void ReadMessages()
         {
             NetIncomingMessage message;
-            NetOutgoingMessage response;
 
             if ((message = server.ReadMessage()) == null)
                 return;
@@ -29,81 +27,49 @@ namespace Network
                 case NetIncomingMessageType.DebugMessage:
                     Debug.Log(message.ReadString());
                     break;
+
                 case NetIncomingMessageType.WarningMessage:
                     Debug.Log(message.ReadString());
                     break;
+
                 case NetIncomingMessageType.ErrorMessage:
                     Debug.Log(message.ReadString());
                     break;
+
                 case NetIncomingMessageType.DiscoveryRequest:
                     //Answer discoveryrequest from client and allow to connect
                     if (!clients.ContainsKey(message.SenderEndPoint))
                     {
-                        response = server.CreateMessage("CrystallStudios-GameServer");
+                        NetOutgoingMessage response = server.CreateMessage("CrystallStudios-GameServer");
                         server.SendDiscoveryResponse(response, message.SenderEndPoint);
 
                         Debug.Log(message.SenderEndPoint + " has discovered the server!");
                     }
-
                     break;
+
                 case NetIncomingMessageType.ConnectionApproval:
                     //Accept new clients that are trying to connect
                     message.SenderConnection.Approve();
                     Debug.Log(message.SenderEndPoint + " approved.");
                     break;
+
                 case NetIncomingMessageType.Data:
                     byte type = message.ReadByte();
                     ProcessMessage(type, message);
                     break;
+
                 case NetIncomingMessageType.StatusChanged:
                     NetConnectionStatus state = (NetConnectionStatus) message.ReadByte();
                     if (state == NetConnectionStatus.Disconnected || state == NetConnectionStatus.Disconnecting)
                     {
-                        if (!clients.ContainsKey(message.SenderEndPoint))
-                            break;
-                        if (clientsTransform.ContainsKey(clients[message.SenderEndPoint].ID))
-                        {
-                            GameServerCycle.getInstance()
-                                .DestroyNetObject(clientsTransform[clients[message.SenderEndPoint].ID]);
-                            clientsTransform.Remove(clients[message.SenderEndPoint].ID);
-                        }
-
-
-                        foreach (var client in clients)
-                        {
-                            if (client.Key.Equals(message.SenderEndPoint) || client.Value.Connection.Equals(null))
-                                continue;
-                            PacketController.getInstance().SendClientDisconnect(clients[message.SenderEndPoint],
-                                client.Value.Connection);
-                        }
-
-                        clients.Remove(message.SenderEndPoint);
+                        RemoveClient(message.SenderEndPoint);
                     }
                     else if (state == NetConnectionStatus.Connected)
                     {
-                        //new player connects to the server
-                        if (clients.ContainsKey(message.SenderEndPoint)) break;
-                        ClientData newClient = new ClientData(message.SenderConnection, ClientData.GetFreeID(clients));
-                        clients.Add(message.SenderEndPoint, newClient);
-
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.CONNECTED);
-                        response.Write(newClient.ID);
-                        response.Write((short) clients.Count); //Anzahl aktueller Clients senden
-                        server.SendMessage(response, message.SenderConnection, NetDeliveryMethod.ReliableUnordered);
-
-                        foreach (var client in clients.Values)
-                        {
-                            if (client.Equals(newClient)) continue;
-
-                            //Tell all clients, a new client connected
-                            PacketController.getInstance().SendNewClientConnected(newClient);
-                        }
-
-                        Debug.Log("Created client with id '" + newClient.ID + "'!");
+                        AddClient(message.SenderConnection, message.SenderEndPoint);
                     }
-
                     break;
+
                 default:
                     Debug.Log("Unhandled Messagetype: " + message.MessageType);
                     break;
@@ -113,7 +79,6 @@ namespace Network
         private void ProcessMessage(byte id, NetIncomingMessage message)
         {
             //Protokoll : [Byte], [Value], [Value], ...
-            NetOutgoingMessage response;
             switch (id)
             {
                 case 0x0: //positionupdate
@@ -129,7 +94,6 @@ namespace Network
                                       _client.moveTime);
                         }
                     }
-
                     break;
 
                 case 0x1: //gamestate
@@ -148,7 +112,6 @@ namespace Network
                         PacketController.getInstance()
                             .SendNetworkObjectSpawn(netObject, clients[message.SenderEndPoint].Connection);
                     }
-
                     Debug.Log("Sent PLAYERLIST to " + clients[message.SenderEndPoint].ID);
                     break;
 
@@ -161,7 +124,9 @@ namespace Network
                     HealthController.getInstance().CalculatePlayerHitpoints(attacker, defender);
 
                     foreach (ClientData client in clients.Values)
+                    {
                         PacketController.getInstance().SendPlayerHPUpdate(defender, client.Connection);
+                    }
                     break;
 
                 case 0x4: //update animation
@@ -170,7 +135,9 @@ namespace Network
                     List<ClientData> _others = Utils.GetOtherClients(animPlayer, clients);
 
                     foreach (ClientData c in _others)
+                    {
                         PacketController.getInstance().SendPlayerAnimationState(animPlayer, c.Connection);
+                    }
                     break;
 
                 case 0x5: //chat event
@@ -179,22 +146,21 @@ namespace Network
                     //TODO make it possible to write a personal message to other players
                     //TODO add commands
                     foreach (ClientData rec in clients.Values)
+                    {
                         PacketController.getInstance()
                             .SendChatMessage(clients[message.SenderEndPoint], rec.Connection, message.ReadString());
+                    }
                     break;
 
                 case 0x6: //team join+
-                    Debug.Log("Received team join request");
                     int teamId = message.ReadInt32();
                     if (TeamController.getInstance().AddToTeam(clients[message.SenderEndPoint], teamId))
-                        GameServerCycle.getInstance()
-                            .SpawnPlayer(clients[message.SenderEndPoint]);
+                        GameServerCycle.getInstance().SpawnPlayer(clients[message.SenderEndPoint]);
                     foreach (var receiver in clients.Values)
                     {
                         PacketController.getInstance()
                             .SendPlayerTeamJoin(clients[message.SenderEndPoint], receiver.Connection);
                     }
-
                     break;
 
                 case 0x7: //cutTree / farming
@@ -212,14 +178,11 @@ namespace Network
                         Vector3 dropLocation = Utils.CalculateDropLocation(netObjs[interactEntityID].Position,
                             (int) GameConstants.dropRange);
 
-                        GameServerCycle.getInstance()
-                            .DestroyNetObject(netObjs[interactEntityID]);
-
-                        GameServerCycle.getInstance()
-                            .SpawnPrefab(PrefabTypes.WOOD, dropLocation);
+                        GameServerCycle.getInstance().DestroyNetObject(netObjs[interactEntityID]);
+                        PrefabController.getInstance().SpawnPrefab(PrefabTypes.WOOD, dropLocation);
                     }
-
                     break;
+
                 case 0x8: //addItemRequest / pickup Item
                     //TODO add picker 
                     //short pickerID = message.ReadInt16();
@@ -228,29 +191,21 @@ namespace Network
                     if (netObjs.ContainsKey(netId) &&
                         Utils.CanInteract(clients[message.SenderEndPoint], netObjs[netId].Position))
                     {
-                        GameServerCycle.getInstance()
-                            .DestroyNetObject(netObjs[netId].gameObject);
-                        response = server.CreateMessage();
-                        response.Write((byte) PacketTypes.PICKUP);
-                        response.Write(netId);
-                        server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
+                        //TODO move into own class as an interact event and check what happens if a player interacts with an item (pickup, destroy etc.)
+                        //GameServerCycle.getInstance().DestroyNetObject(netObjs[netId].gameObject);
+                        //var response = server.CreateMessage();
+                        //response.Write((byte) PacketTypes.PICKUP);
+                        //response.Write(netId);
+                        //server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                         //TODO check add inventory attribute to the clientdata
                     }
-
                     break;
 
                 case 0x9: //weapon change event
-                    clients[message.SenderEndPoint].WeaponState = (WeaponStates) message.ReadInt16();
-                    response = server.CreateMessage();
-                    response.Write((byte) PacketTypes.WEAPONCHANGE);
-                    response.Write(clients[message.SenderEndPoint].ID);
-                    response.Write((short) clients[message.SenderEndPoint].WeaponState);
-                    server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                     break;
 
                 case 0x10: //spawn 
 //                    netId = message.ReadInt16();
-
                     break;
             }
         }

@@ -1,26 +1,9 @@
 ﻿using Lidgren.Network;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Network.Packets
 {
-    //        Server| Packets
-    //-------
-    //0x00: Client connected 
-    //0x01: Client disconnected
-    //0x02: Client-Information für connectenden Client: Teilt ihm seine ID mit
-    //0x03: Client hat Spieler x gehitted
-    //0x04: Client hat Item X benutzt
-    //0x05: Client hat zu Waffe X gewechselt
-    //0x06: Client hat seine Todeszeit nachgefragt, wenn lebt -> sende respawn
-
-    //0x10: Positionsänderung (wird an alle Clients versendet)
-    //0x11: Liste aller Clients (ID und Position) für einen neu-verbundenen Client
-    //0x12: Akualisiere GameData (GameTime)
-    //0x13: Sende Spieler X wurde getroffen
-    //0x14: Sende Spieler X hat Item Y benutzt
-    //0x15: Sende Spieler X hat zu Waffe Y gewechselt
-    //0x16: RespawnPlayer
-
     public class PacketController : MonoBehaviour
     {
         private static PacketController instance;
@@ -41,11 +24,27 @@ namespace Network.Packets
             return instance;
         }
 
-        public void SendClientConnect(ClientData _client, NetConnection receiver)
+        /// <summary>
+        /// Sends an answer to a player, that is trying to connect
+        /// </summary>
+        /// <param name="_client"></param>
+        public void SendClientConnectAnswer(ClientData _client)
         {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Sent player connection answer to (" + _client.ID + ")");
+
+            NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
+            response.Write((byte) PacketTypes.CONNECTED);
+            response.Write(_client.ID);
+            response.Write((short) Server.getInstance().clients.Count); //Anzahl aktueller Clients senden
+            Server.getInstance().server.SendMessage(response, _client.Connection, NetDeliveryMethod.ReliableUnordered);
         }
 
-        public void SendClientDisconnect(ClientData _client, NetConnection receiver)
+        /// <summary>
+        /// Sends a message to all players, that a certain player disconnected
+        /// </summary>
+        /// <param name="_client"></param>
+        public void SendClientDisconnect(ClientData _client)
         {
             if (Server.getInstance().debugMode)
                 Debug.Log("Player disconnected: " + _client.UserName + "(" + _client.ID + ")");
@@ -53,9 +52,13 @@ namespace Network.Packets
             NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
             response.Write((byte) PacketTypes.DISCONNECTED); //0x01: Ein Client hat disconnected
             response.Write(_client.ID);
-            Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Sends a message to all players, that a new player connected
+        /// </summary>
+        /// <param name="_client"></param>
         public void SendNewClientConnected(ClientData _client)
         {
             if (Server.getInstance().debugMode)
@@ -74,6 +77,12 @@ namespace Network.Packets
             Server.getInstance().server.SendToAll(response, _client.Connection, NetDeliveryMethod.ReliableOrdered, 1);
         }
 
+        /// <summary>
+        /// Sends a network chat message to all player
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="receiver"></param>
+        /// <param name="message"></param>
         public void SendChatMessage(ClientData _client, NetConnection receiver, string message)
         {
             if (Server.getInstance().debugMode)
@@ -86,6 +95,11 @@ namespace Network.Packets
             Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Sends an hp update to a player
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="receiver"></param>
         public void SendPlayerHPUpdate(ClientData _client, NetConnection receiver)
         {
             if (Server.getInstance().debugMode)
@@ -98,6 +112,11 @@ namespace Network.Packets
             Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Notifies the players, that a new player joined a team
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="receiver"></param>
         public void SendPlayerTeamJoin(ClientData _client, NetConnection receiver)
         {
             if (Server.getInstance().debugMode)
@@ -115,6 +134,10 @@ namespace Network.Packets
             Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Sends an update of a players postition to all other players
+        /// </summary>
+        /// <param name="_client"></param>
         public void SendPlayerPosition(ClientData _client)
         {
             if (Server.getInstance().debugMode)
@@ -134,6 +157,11 @@ namespace Network.Packets
             Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Sends an update of a players animation state to all other players
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="receiver"></param>
         public void SendPlayerAnimationState(ClientData _client, NetConnection receiver)
         {
             if (Server.getInstance().debugMode)
@@ -146,6 +174,10 @@ namespace Network.Packets
             Server.getInstance().server.SendMessage(response, receiver, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Notifies all players, that a player respawned
+        /// </summary>
+        /// <param name="_client"></param>
         public void SendPlayerRespawn(ClientData _client)
         {
             if (Server.getInstance().debugMode)
@@ -164,6 +196,11 @@ namespace Network.Packets
             Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Sends a new player a list of the current players
+        /// </summary>
+        /// <param name="_client"></param>
+        /// <param name="receiver"></param>
         public void SendPlayerList(ClientData _client, NetConnection receiver)
         {
             if (Server.getInstance().debugMode)
@@ -239,6 +276,10 @@ namespace Network.Packets
             Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
         }
 
+        /// <summary>
+        /// Updates a position of a network object
+        /// </summary>
+        /// <param name="obj"></param>
         public void SendNetworkObjectPosition(NetworkObject obj)
         {
             if (Server.getInstance().debugMode)
@@ -257,6 +298,10 @@ namespace Network.Packets
             Server.getInstance().server.SendToAll(response, NetDeliveryMethod.UnreliableSequenced);
         }
 
+        /// <summary>
+        /// Notifies all player, that a network object got destroyed
+        /// </summary>
+        /// <param name="obj"></param>
         public void SendNetworkObjectDestroy(NetworkObject obj)
         {
             if (Server.getInstance().debugMode)
@@ -266,6 +311,22 @@ namespace Network.Packets
             response.Write((byte) PacketTypes.DESTROY_NETWORK_OBJECT);
             response.Write(obj.ID);
             Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        /// <summary>
+        /// Updates the weapon state of a player
+        /// </summary>
+        /// <param name="_client"></param>
+        public void SendWeaponChange(ClientData _client)
+        {
+            if (Server.getInstance().debugMode)
+                Debug.Log("Update Weapon State (" + _client.ID + ")");
+
+            NetOutgoingMessage response = Server.getInstance().server.CreateMessage();
+            response.Write((byte) PacketTypes.WEAPONCHANGE);
+            response.Write(_client.ID);
+            response.Write((int) _client.WeaponState);
+            Server.getInstance().server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
         }
     }
 

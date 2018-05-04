@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Lidgren.Network;
+using Network.Packets;
 using UnityEngine;
 
 namespace Network
@@ -12,13 +13,10 @@ namespace Network
         private NetPeerConfiguration config;
         public NetServer server;
 
-        public Dictionary<IPEndPoint, ClientData> clients;
-        public Dictionary<short, Transform> clientsTransform;
         public Dictionary<int, NetworkObject> netObjs = new Dictionary<int, NetworkObject>();
         private int objectCount;
 
         private Thread serverThread;
-        //  private Thread gameThread;
 
         public bool debugMode;
         public bool isStarted;
@@ -28,6 +26,9 @@ namespace Network
 
         private static Server instance;
         public float serverTime;
+
+        public Dictionary<IPEndPoint, ClientData> clients;
+        public Dictionary<short, Transform> clientsTransform;
 
         public static Server getInstance()
         {
@@ -51,8 +52,6 @@ namespace Network
         {
             Debug.Log("Setting up server ...");
 
-            clients = new Dictionary<IPEndPoint, ClientData>();
-            clientsTransform = new Dictionary<short, Transform>();
             try
             {
                 config = new NetPeerConfiguration("CrystallStudios");
@@ -62,9 +61,11 @@ namespace Network
                 config.UseMessageRecycling = true;
                 config.AutoFlushSendQueue = true;
 
+                clients = new Dictionary<IPEndPoint, ClientData>();
+                clientsTransform = new Dictionary<short, Transform>();
+
                 //config.SimulatedRandomLatency = 0.6f;
                 //config.SimulatedLoss = 0.05f;
-//                UnityThread.initUnityThread();
                 server = new NetServer(config);
                 server.Start();
             }
@@ -76,11 +77,6 @@ namespace Network
 
             if (ConnectoDB())
             {
-//                serverThread = new Thread(WorkMessages);
-//                serverThread.Start();
-
-                //gameThread = new Thread(WorkGameData);
-                //gameThread.Start();
                 isStarted = true;
                 Debug.Log("Server started successfully");
                 return;
@@ -117,5 +113,51 @@ namespace Network
         {
             DeadLine();
         }
+
+
+        /// <summary>
+        /// Adds a new client to the list 
+        /// </summary>
+        /// <param name="ipEndPoint"></param>
+        public void AddClient(NetConnection _connection, IPEndPoint _ipEndPoint)
+        {
+            if (!clients.ContainsKey(_ipEndPoint))
+            {
+                ClientData newClient = new ClientData(_connection, ClientData.GetFreeID(clients));
+                clients.Add(_ipEndPoint, newClient);
+
+                foreach (var client in clients.Values)
+                {
+                    if (client.Equals(newClient)) continue;
+                    //Tell all clients, a new client connected
+                    PacketController.getInstance().SendNewClientConnected(newClient);
+                }
+
+                if (debugMode)
+                    Debug.Log("Created client with id '" + newClient.ID + "'!");
+            }
+        }
+
+        /// <summary>
+        /// Removes a client from the list and also removes the transform if one exists
+        /// </summary>
+        /// <param name="ipEndPoint"></param>
+        public void RemoveClient(IPEndPoint ipEndPoint)
+        {
+            if (clients.ContainsKey(ipEndPoint))
+            {
+                ClientData _client = clients[ipEndPoint];
+                //inform all players, that a client disconnected
+                PacketController.getInstance().SendClientDisconnect(clients[ipEndPoint]);
+                if (clientsTransform.ContainsKey(_client.ID))
+                {
+                    GameServerCycle.getInstance()
+                        .DestroyNetObject(clientsTransform[clients[ipEndPoint].ID]);
+                }
+                clients.Remove(ipEndPoint);
+            }
+        }
     }
+}
+
 }
