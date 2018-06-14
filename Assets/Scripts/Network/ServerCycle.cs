@@ -7,6 +7,8 @@ using Network.Movement;
 using Network.Packets;
 using Network.Prefabs;
 using Network.Teams;
+using Network.Weapons;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using Utility;
 
@@ -45,6 +47,7 @@ namespace Network
 
                         Debug.Log(message.SenderEndPoint + " has discovered the server!");
                     }
+
                     break;
 
                 case NetIncomingMessageType.ConnectionApproval:
@@ -68,6 +71,7 @@ namespace Network
                     {
                         AddClient(message.SenderConnection, message.SenderEndPoint);
                     }
+
                     break;
 
                 default:
@@ -79,10 +83,10 @@ namespace Network
         private void ProcessMessage(byte id, NetIncomingMessage message)
         {
             //Protokoll : [Byte], [Value], [Value], ...
+            ClientData _client = clients[message.SenderEndPoint];
             switch (id)
             {
                 case 0x0: //positionupdate
-                    ClientData _client = clients[message.SenderEndPoint];
                     _client.MoveDir = (MoveDirs) message.ReadInt32();
                     _client.Rotation = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
                     if (_client.WantsPredict)
@@ -90,21 +94,22 @@ namespace Network
                         float movetime = message.ReadFloat();
                         if (movetime <= _client.moveTime)
                         {
-                            Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " +
-                                      _client.moveTime);
+                            if (debugMode)
+                                Debug.Log("Client movetime mismatch! Client(" + _client.ID + "):" + movetime + "  -- " +
+                                          _client.moveTime);
                         }
                     }
+
                     break;
 
                 case 0x1: //gamestate
                     List<ClientData> _clients = (from client in clients
                         where client.Value.ID != clients[message.SenderEndPoint].ID
                         select client.Value).ToList();
-                    foreach (ClientData client in _clients)
+                    foreach (ClientData c in _clients)
                     {
-                        if (client.Connection == null) continue;
-                        PacketController.getInstance()
-                            .SendPlayerList(client, clients[message.SenderEndPoint].Connection);
+                        if (c.Connection == null) continue;
+                        PacketController.getInstance().SendPlayerList(c, clients[message.SenderEndPoint].Connection);
                     }
 
                     foreach (var netObject in netObjs.Values)
@@ -112,7 +117,10 @@ namespace Network
                         PacketController.getInstance()
                             .SendNetworkObjectSpawn(netObject, clients[message.SenderEndPoint].Connection);
                     }
+
                     Debug.Log("Sent PLAYERLIST to " + clients[message.SenderEndPoint].ID);
+                    /*Takes me one step closer to the
+                    edge and I'm about to */
                     break;
 
                 case 0x3: //statsUpdate
@@ -127,6 +135,7 @@ namespace Network
                     {
                         PacketController.getInstance().SendPlayerHPUpdate(defender, client.Connection);
                     }
+
                     break;
 
                 case 0x4: //update animation
@@ -138,6 +147,7 @@ namespace Network
                     {
                         PacketController.getInstance().SendPlayerAnimationState(animPlayer, c.Connection);
                     }
+
                     break;
 
                 case 0x5: //chat event
@@ -147,12 +157,13 @@ namespace Network
                     //TODO add commands
                     foreach (ClientData rec in clients.Values)
                     {
-                        PacketController.getInstance()
-                            .SendChatMessage(clients[message.SenderEndPoint], rec.Connection, message.ReadString());
+                        PacketController.getInstance().SendChatMessage(clients[message.SenderEndPoint], rec.Connection,
+                            message.ReadString());
                     }
+
                     break;
 
-                case 0x6: //team join+
+                case 0x6: //team join
                     int teamId = message.ReadInt32();
                     if (TeamController.getInstance().AddToTeam(clients[message.SenderEndPoint], teamId))
                         GameServerCycle.getInstance().SpawnPlayer(clients[message.SenderEndPoint]);
@@ -161,9 +172,10 @@ namespace Network
                         PacketController.getInstance()
                             .SendPlayerTeamJoin(clients[message.SenderEndPoint], receiver.Connection);
                     }
+
                     break;
 
-                case 0x7: //cutTree / farming
+                case 0x7: //farming
                     short interactEntityID = message.ReadInt16();
                     Vector3 targetPos = new Vector3(message.ReadFloat(), message.ReadFloat(), message.ReadFloat());
 
@@ -181,6 +193,7 @@ namespace Network
                         GameServerCycle.getInstance().DestroyNetObject(netObjs[interactEntityID]);
                         PrefabController.getInstance().SpawnPrefab(PrefabTypes.WOOD, dropLocation);
                     }
+
                     break;
 
                 case 0x8: //addItemRequest / pickup Item
@@ -199,13 +212,26 @@ namespace Network
                         //server.SendToAll(response, NetDeliveryMethod.ReliableUnordered);
                         //TODO check add inventory attribute to the clientdata
                     }
+
+                   
                     break;
 
                 case 0x9: //weapon change event
+                    _client.WeaponState = (WeaponStates) message.ReadInt32();
+
+                    if (debugMode)
+                        Debug.Log("Changed weapon of " + _client.ID + " to " + _client.WeaponState);
+
+                    PacketController.getInstance().SendWeaponChange(_client);
                     break;
 
                 case 0x10: //spawn 
 //                    netId = message.ReadInt16();
+                    break;
+
+                case 0x11: //attack request (spells, projectiles)
+
+                    PrefabController.getInstance().SpawnPrefab(PrefabTypes.ARROW, _client.Position);
                     break;
             }
         }

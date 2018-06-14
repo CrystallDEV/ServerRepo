@@ -123,6 +123,7 @@ namespace Network
         {
             if (!clients.ContainsKey(_ipEndPoint))
             {
+                //TODO get the username of the player that is logging in and fetch the data
                 ClientData newClient = new ClientData(_connection, ClientData.GetFreeID(clients));
                 clients.Add(_ipEndPoint, newClient);
 
@@ -132,6 +133,8 @@ namespace Network
                     //Tell all clients, a new client connected
                     PacketController.getInstance().SendNewClientConnected(newClient);
                 }
+
+                PacketController.getInstance().SendClientConnectAnswer(newClient);
 
                 if (debugMode)
                     Debug.Log("Created client with id '" + newClient.ID + "'!");
@@ -154,10 +157,10 @@ namespace Network
                     GameServerCycle.getInstance()
                         .DestroyNetObject(clientsTransform[clients[ipEndPoint].ID]);
                 }
+
+                clientsTransform.Remove(clients[ipEndPoint].ID);
                 clients.Remove(ipEndPoint);
             }
         }
     }
-}
-
 }

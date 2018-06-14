@@ -33,7 +33,7 @@ namespace Network
             CalculatePlayerDeathTime();
         }
 
-        public void CalculatePlayerMovement()
+        private void CalculatePlayerMovement()
         {
             foreach (ClientData _client in Server.getInstance().clients.Values)
             {
@@ -42,7 +42,7 @@ namespace Network
             }
         }
 
-        public void CalculatePlayerDeathTime()
+        private void CalculatePlayerDeathTime()
         {
             foreach (ClientData _client in Server.getInstance().clients.Values)
             {
